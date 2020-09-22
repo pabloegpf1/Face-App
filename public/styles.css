@@ -1,0 +1,15 @@
+#container{
+    width: 100%;
+    display: flex;
+    margin-top: 30px;
+    justify-content: center;
+}
+
+.row{
+    margin: 20px!important;
+}
+
+canvas, img {
+    position: absolute;
+}
+
