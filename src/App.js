@@ -1,17 +1,20 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as tf from '@tensorflow/tfjs';
-import {setWasmPath} from '@tensorflow/tfjs-backend-wasm';
+import {setWasmPaths} from '@tensorflow/tfjs-backend-wasm';
 import * as faceapi from 'face-api.js';
 import Recognizer from './components/Recognizer'
+import Navbar from './components/NavBar';
 
-const MODEL_URL = './assets/models/'
-const WASM_URL = '/assets/tfjs-backend-wasm.wasm'
+
+const TF_BACKEND = 'webgl'; //wasm - webgl - cpu
+const MODEL_PATH = './models/'
+const WASM_PATH = './wasm/'
 
 class App extends React.Component {
 
-    constructor(props) {
-        super(props);
+    constructor() {
+        super();
         this.state = {
             tensorflowReady: false,
             faceApiReady: false
@@ -20,24 +23,22 @@ class App extends React.Component {
 
     componentDidMount(){
         this.loadTensorFlow()
-        .then(this.loadFaceApi());
+        .then(() => this.setState({tensorflowReady: true, tfBackend: tf.getBackend()}))
+        .then(() => this.loadFaceApi())
+        .catch((error) => console.error("Error loading TensorFlow"+error));
     }
 
-    loadTensorFlow(){
-        return Promise.all([
-            setWasmPath(WASM_URL),
-            tf.setBackend('webgl'),
-            tf.ready()
-        ])
-        .then(()=>this.setState({tensorflowReady: true}))
-        .catch((error)=> console.error("Error loading TensorFlow"+error));
+    async loadTensorFlow(){
+        setWasmPaths(WASM_PATH);
+        await tf.setBackend(TF_BACKEND)
+        return tf.ready()
     }
 
     loadFaceApi(){
         return Promise.all([
-            faceapi.loadSsdMobilenetv1Model(MODEL_URL),
-            faceapi.loadFaceLandmarkModel(MODEL_URL),
-            faceapi.loadFaceRecognitionModel(MODEL_URL)
+            faceapi.loadTinyFaceDetectorModel(MODEL_PATH),
+            faceapi.loadFaceLandmarkTinyModel(MODEL_PATH),
+            faceapi.loadFaceRecognitionModel(MODEL_PATH)
         ])
         .then(()=>this.setState({faceApiReady: true}))
         .catch((error)=> console.error("Error loading Faceapi"+error));
@@ -53,6 +54,7 @@ class App extends React.Component {
         else{
             return (
                 <div className="App">
+                    <Navbar tfBackend={this.state.tfBackend}/>
                     <Recognizer />
                 </div>
             );

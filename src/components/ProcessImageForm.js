@@ -5,8 +5,8 @@ const defaultProcessImageButtonText = "Process Image";
 
 class ProcessImageForm extends React.Component {
 
-    constructor(props) {
-        super(props);
+    constructor() {
+        super();
         this.state = {
             showSpinner: false,
             buttonText: defaultProcessImageButtonText,

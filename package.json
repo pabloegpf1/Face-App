@@ -3,14 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@tensorflow/tfjs": "1.7.x",
-    "@tensorflow/tfjs-backend-wasm": "1.7.x",
-    "@tensorflow/tfjs-core": "1.7.x",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1",
+    "@tensorflow/tfjs": "^2.4.0",
+    "@tensorflow/tfjs-backend-wasm": "^2.4.0",
+    "@tensorflow/tfjs-core": "^2.4.0",
     "bootstrap": "^4.5.2",
-    "canvas": "^2.6.1",
     "face-api.js": "^0.22.2",
     "popper.js": "^1.16.1",
     "react": "^16.13.1",
@@ -19,6 +15,7 @@
     "react-scripts": "3.4.3"
   },
   "scripts": {
+    "prestart": "sudo cp ./node_modules/@tensorflow/tfjs-backend-wasm/dist/*.wasm ./public/wasm/",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

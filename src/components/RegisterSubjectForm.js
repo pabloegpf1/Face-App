@@ -5,8 +5,8 @@ const defaultRegisterButtonText = "Register Subject";
 
 class RegisterSubjectForm extends React.Component {
 
-    constructor(props) {
-        super(props);
+    constructor() {
+        super();
         this.state = {
             showSpinner: false,
             buttonText: defaultRegisterButtonText,

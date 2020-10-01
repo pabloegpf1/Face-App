@@ -14,11 +14,11 @@ export async function getLabeledDescriptors(label, images) {
 }
 
 export async function getDetectionForImage(image) {
-    return await faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor();
+    return await faceapi.detectSingleFace(image, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks(true).withFaceDescriptor();
 }
 
 export async function getAllDetectionsForImage(image) {
-    let detections = await faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors();
+    let detections = await faceapi.detectAllFaces(image, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks(true).withFaceDescriptors();
     const displaySize = getDisplaySize(image);
     return faceapi.resizeResults(detections, displaySize);
 }
@@ -47,7 +47,6 @@ export function drawDetectionsInCanvas(canvas, detections){
 
 export async function drawLabeledDetectionsInCanvas(descriptions, detections, canvas) {
     detections.forEach((detection, i) => {
-        console.log(detection, descriptions[i])
         const box = descriptions[i].detection.box;
         const text = detection.toString();
         const drawBox = new faceapi.draw.DrawBox(box, { label: text });

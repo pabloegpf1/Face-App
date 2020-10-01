@@ -1,6 +1,5 @@
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
-import Navbar from './NavBar';
 import ProcessImageForm from './ProcessImageForm';
 import RegisterSubjectForm from './RegisterSubjectForm';
 
@@ -8,8 +7,8 @@ import * as faceApi from '../scripts/faceApi.js';
 
 class Recognizer extends React.Component {
 
-    constructor(props) {
-        super(props);
+    constructor() {
+        super();
         this.state = {
             labeledDescriptors: []
         };
@@ -46,7 +45,6 @@ class Recognizer extends React.Component {
     render() {
         return (
             <div>
-                <Navbar />
                 <Row>
                     <Col>
                         <h2>Register subject</h2>
