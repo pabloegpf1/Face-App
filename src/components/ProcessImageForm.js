@@ -1,5 +1,5 @@
 import React from 'react';
-import {  Form, Button, Col, Spinner } from 'react-bootstrap';
+import { Form, Button, Col, Spinner } from 'react-bootstrap';
 
 const defaultProcessImageButtonText = "Process Image";
 

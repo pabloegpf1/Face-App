@@ -1,7 +1,27 @@
-const faceapi = require('face-api.js');
+import {setWasmPaths} from '@tensorflow/tfjs-backend-wasm';
+import * as faceapi from '@vladmandic/face-api/dist/face-api.esm';
 
+const MODEL_PATH = './models/'
+const WASM_PATH = './wasm/'
 const maxDescriptorDistance = 0.6; 
 const displayWidth = 750;
+
+export async function loadTensorFlow(backend = "webgl"){
+    await setWasmPaths(WASM_PATH);
+    await faceapi.tf.setBackend(backend);
+    await faceapi.tf.ready();
+    console.log(faceapi.tf.version)
+    return faceapi.tf;
+}
+
+export async function loadFaceApi(){
+    return Promise.all([
+        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_PATH),
+        faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_PATH),
+        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_PATH),
+    ])
+    .catch((error)=> console.error("Error loading Faceapi: "+error));
+}
 
 export async function getLabeledDescriptors(label, images) {
     let descriptorsForSubject = [];
@@ -14,11 +34,11 @@ export async function getLabeledDescriptors(label, images) {
 }
 
 export async function getDetectionForImage(image) {
-    return await faceapi.detectSingleFace(image, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks(true).withFaceDescriptor();
+    return await faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor();
 }
 
 export async function getAllDetectionsForImage(image) {
-    let detections = await faceapi.detectAllFaces(image, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks(true).withFaceDescriptors();
+    let detections = await faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors();
     const displaySize = getDisplaySize(image);
     return faceapi.resizeResults(detections, displaySize);
 }
