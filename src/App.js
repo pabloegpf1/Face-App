@@ -1,15 +1,10 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import * as tf from '@tensorflow/tfjs';
-import {setWasmPaths} from '@tensorflow/tfjs-backend-wasm';
-import * as faceapi from 'face-api.js';
 import Recognizer from './components/Recognizer'
 import Navbar from './components/NavBar';
+import {loadTensorFlow, loadFaceApi} from './scripts/faceApi';
 
-
-const TF_BACKEND = 'webgl'; //wasm - webgl - cpu
-const MODEL_PATH = './models/'
-const WASM_PATH = './wasm/'
+const BACKEND = new URLSearchParams(window.location.search).get('backend') || 'webgl';
 
 class App extends React.Component {
 
@@ -22,31 +17,16 @@ class App extends React.Component {
     }
 
     componentDidMount(){
-        this.loadTensorFlow()
-        .then(() => this.setState({tensorflowReady: true, tfBackend: tf.getBackend()}))
-        .then(() => this.loadFaceApi())
+        loadTensorFlow(BACKEND)
+        .then((tf) => this.setState({tensorflowReady: true, tfBackend: tf.getBackend()}))
+        .then(() => loadFaceApi())
+        .then(() => this.setState({faceApiReady: true}))
         .catch((error) => console.error("Error loading TensorFlow"+error));
-    }
-
-    async loadTensorFlow(){
-        setWasmPaths(WASM_PATH);
-        await tf.setBackend(TF_BACKEND)
-        return tf.ready()
-    }
-
-    loadFaceApi(){
-        return Promise.all([
-            faceapi.loadTinyFaceDetectorModel(MODEL_PATH),
-            faceapi.loadFaceLandmarkTinyModel(MODEL_PATH),
-            faceapi.loadFaceRecognitionModel(MODEL_PATH)
-        ])
-        .then(()=>this.setState({faceApiReady: true}))
-        .catch((error)=> console.error("Error loading Faceapi"+error));
     }
 
     render() {
         if(!this.state.tensorflowReady){
-            return (<p>Loading TensorFlow (WASM)...</p>)
+            return (<p>Loading TensorFlow...</p>)
         }
         if(!this.state.faceApiReady){
             return (<p>Loading FaceApi...</p>)
