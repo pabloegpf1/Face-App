@@ -25,7 +25,6 @@ function NavbarComponent(props) {
 }
 
 function backendUrl(backend){
-    console.log(backend)
     return window.location.origin + "/Face-App?backend=" + backend;
 }
 
