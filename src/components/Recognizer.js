@@ -1,16 +1,19 @@
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
-import ProcessImageForm from './ProcessImageForm';
-import RegisterSubjectForm from './RegisterSubjectForm';
+import RecognizeForm from './RecognizeForm';
+import RegisterForm from './RegisterForm';
+import WebCam from './WebCam';
 
 import * as faceApi from '../scripts/faceApi.js';
+import * as utils from '../scripts/utils.js';
 
 class Recognizer extends React.Component {
 
     constructor() {
         super();
         this.state = {
-            labeledDescriptors: []
+            labeledDescriptors: [],
+            activateWebcam: false
         };
     }
 
@@ -32,32 +35,33 @@ class Recognizer extends React.Component {
         }else{
             await faceApi.drawDetectionsInCanvas(canvas, detections);
         }
-        this.showResultsInContainer(image, canvas);
+        utils.showResultsInContainer(image, canvas);
     }
 
-    showResultsInContainer(image, canvas){
-        const containerDiv = document.getElementById('resultsContainer');
-        containerDiv.innerHTML = "";
-        containerDiv.append(image);
-        containerDiv.append(canvas);
-    }
+    changeWebcamState = (activateWebcam) => this.setState({activateWebcam});
 
     render() {
         return (
             <div>
                 <Row>
                     <Col>
-                        <h2>Register subject</h2>
-                        <RegisterSubjectForm 
+                        <h2>Register</h2>
+                        <RegisterForm 
                             registerSubject={this.registerSubject}
                         />
                     </Col>
                     <Col>
-                        <h2>Identify people</h2>
-                        <ProcessImageForm 
+                        <h2>Recognize</h2>
+                        <RecognizeForm 
                             recognizeFaces={this.recognizeFaces}
+                            changeWebcamState={this.changeWebcamState}
                         />
                     </Col>
+                </Row>
+                <Row>
+                    {this.state.activateWebcam &&
+                        <WebCam />
+                    }
                 </Row>
                 <div id="resultsContainer"></div>
             </div>

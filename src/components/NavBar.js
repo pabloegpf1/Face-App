@@ -1,6 +1,8 @@
 import React from 'react';
 import { Navbar, ButtonGroup, Button } from 'react-bootstrap';
 
+import * as constants from '../constants';
+
 function NavbarComponent(props) {
     return (
         <Navbar bg="dark" variant="dark">
@@ -8,16 +10,16 @@ function NavbarComponent(props) {
             <Navbar.Collapse className="justify-content-end">
                 <ButtonGroup size="sm" className="mb-2">
                     <Button 
-                        href={backendUrl("webgl")} 
-                        disabled={props.tfBackend==="webgl"}
+                        href={backendUrl(constants.WEBGL_BACKEND)} 
+                        disabled={props.tfBackend===constants.WEBGL_BACKEND}
                     >webgl</Button>
                     <Button 
-                        href={backendUrl("cpu")} 
-                        disabled={props.tfBackend==="cpu"}
+                        href={backendUrl(constants.CPU_BACKEND)} 
+                        disabled={props.tfBackend===constants.CPU_BACKEND}
                     >cpu</Button>
                     <Button 
-                        href={backendUrl("wasm")} 
-                        disabled={props.tfBackend==="wasm"}
+                        href={backendUrl(constants.WASM_BACKEND)} 
+                        disabled={props.tfBackend===constants.WASM_BACKEND}
                     >wasm</Button>
                 </ButtonGroup>
             </Navbar.Collapse>
@@ -25,7 +27,7 @@ function NavbarComponent(props) {
 }
 
 function backendUrl(backend){
-    return window.location.origin + "/Face-App?backend=" + backend;
+    return window.location.origin + constants.BASE_URL + backend;
 }
 
 export default NavbarComponent;

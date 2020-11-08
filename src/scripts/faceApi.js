@@ -1,26 +1,24 @@
+import * as tf from '@tensorflow/tfjs';
 import {setWasmPaths} from '@tensorflow/tfjs-backend-wasm';
-import * as faceapi from '@vladmandic/face-api/dist/face-api.esm';
+import * as faceapi from '@vladmandic/face-api/dist/face-api.nobundle.js';
 
-const MODEL_PATH = './models/'
-const WASM_PATH = './wasm/'
-const maxDescriptorDistance = 0.6; 
-const displayWidth = 750;
+import * as constants from '../constants';
 
 export async function loadTensorFlow(backend = "webgl"){
-    await setWasmPaths(WASM_PATH);
-    await faceapi.tf.setBackend(backend);
-    await faceapi.tf.ready();
-    console.log(faceapi.tf.version)
-    return faceapi.tf;
+    await setWasmPaths(constants.WASM_PATH);
+    await tf.setBackend(backend);
+    await tf.ready();
+    console.log(tf)
+    return tf;
 }
 
 export async function loadFaceApi(){
     return Promise.all([
-        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_PATH),
-        faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_PATH),
-        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_PATH),
+        faceapi.nets.faceLandmark68Net.loadFromUri(constants.MODEL_PATH),
+        faceapi.nets.ssdMobilenetv1.loadFromUri(constants.MODEL_PATH),
+        faceapi.nets.faceRecognitionNet.loadFromUri(constants.MODEL_PATH),
     ])
-    .catch((error)=> console.error("Error loading Faceapi: "+error));
+    .catch((error)=> console.error(constants.FACEAPI_ERROR_TEXT+error));
 }
 
 export async function getLabeledDescriptors(label, images) {
@@ -44,7 +42,7 @@ export async function getAllDetectionsForImage(image) {
 }
 
 export async function detectSubjectsInImage(detections, labeledFaceDescriptors) {
-    const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, maxDescriptorDistance);
+    const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, constants.MAX_DESCRIPTOR_DISTANCE);
     return detections.map(detection =>
         faceMatcher.findBestMatch(detection.descriptor)
     );
@@ -57,6 +55,14 @@ export async function createCanvasFromHtmlImage(image){
     image.height = displaySize.height;
     const canvas = await faceapi.createCanvasFromMedia(image);
     faceapi.matchDimensions(canvas, displaySize);
+    return canvas;
+}
+
+export async function createCanvasFromHtmlVideo(video, detection){
+    const canvas = await faceapi.createCanvasFromMedia(video);
+    const dims = faceapi.matchDimensions(canvas, video, true);
+    const resizedResult = faceapi.resizeResults(detection, dims);
+    drawDetectionsInCanvas(canvas, resizedResult);
     return canvas;
 }
 
@@ -76,7 +82,7 @@ export async function drawLabeledDetectionsInCanvas(descriptions, detections, ca
 
 export function getDisplaySize(image) {
     return { 
-        width: displayWidth, 
-        height: (image.height*displayWidth)/image.width
+        width: constants.CANVAS_DISPLAY_WIDTH, 
+        height: (image.height*constants.CANVAS_DISPLAY_WIDTH)/image.width
     }
 }
