@@ -67,7 +67,7 @@ class WebCam extends React.Component {
                     autoPlay muted playsInline
                 ></video>
                 <p>{`TIME: ${this.state.avgTime || "-"} ms`}</p>
-                <p>{`FPS: ${this.state.fps || "-"} ms`}</p>
+                <p>{`FPS: ${this.state.fps || "-"} fps`}</p>
             </div>
         )
     }
