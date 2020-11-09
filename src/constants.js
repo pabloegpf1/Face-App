@@ -1,8 +1,9 @@
 export const WEBCAM_ON_BUTTON_TEXT = "Turn webcam on";
 export const WEBCAM_OFF_BUTTON_TEXT = "Turn webcam off";
-export const PROCESS_IMAGE_BUTTON_TEXT = "Process image";
-export const PROCESSING_IMAGE_BUTTON_TEXT = "Processing image...";
-
+export const PROCESS_IMAGE_BUTTON_TEXT = "Process";
+export const PROCESSING_IMAGE_BUTTON_TEXT = "Processing";
+export const REGISTER_BUTTON_TEXT = "Register";
+export const REGISTERING_BUTTON_TEXT = "Registering";
 //Face-api
 export const MAX_DESCRIPTOR_DISTANCE = 0.6; 
 export const CANVAS_DISPLAY_WIDTH = 750;

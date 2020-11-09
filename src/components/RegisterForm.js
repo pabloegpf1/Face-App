@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Button, Col, Spinner } from 'react-bootstrap';
 
-const defaultRegisterButtonText = "Register Subject";
+import * as constants from '../constants';
 
 class RegisterSubjectForm extends React.Component {
 
@@ -9,7 +9,7 @@ class RegisterSubjectForm extends React.Component {
         super();
         this.state = {
             showSpinner: false,
-            buttonText: defaultRegisterButtonText,
+            buttonText: constants.REGISTER_BUTTON_TEXT,
         };
     }
 
@@ -28,7 +28,7 @@ class RegisterSubjectForm extends React.Component {
 
     handleRegisterSubjectSubmit = async (event) => {
         event.preventDefault();
-        this.setState({showSpinner: true, buttonText:"Registering Subject..."});
+        this.setState({showSpinner: true, buttonText:constants.REGISTERING_BUTTON_TEXT});
         let images = [];
         this.state.subjectImages.forEach(imageUrl => {
             const image = document.createElement('img');
@@ -36,7 +36,7 @@ class RegisterSubjectForm extends React.Component {
             images.push(image);
         });
         await this.props.registerSubject(this.state.subjectLabel, images);
-        this.setState({showSpinner: false, buttonText:defaultRegisterButtonText});
+        this.setState({showSpinner: false, buttonText:constants.REGISTER_BUTTON_TEXT});
     }
 
     render() {

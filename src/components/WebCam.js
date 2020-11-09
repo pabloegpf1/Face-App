@@ -1,6 +1,5 @@
 import React from 'react';
 
-import * as faceApi from '../scripts/faceApi.js';
 import * as utils from '../scripts/utils.js';
 import * as constants from '../constants';
 
@@ -26,6 +25,10 @@ class WebCam extends React.Component {
     }
 
     componentWillUnmount = () => {
+        const video = document.getElementById(constants.VIDEO_ID);
+        video.src = null;
+        //video.remove();
+        utils.cleanResultsContainer();
         this.setState = (state,callback)=>{
             return;
         };
@@ -37,14 +40,9 @@ class WebCam extends React.Component {
         if (this.state.video.paused || this.state.video.ended)
             return setTimeout(() => this.onPlay())
 
-        const ts = Date.now()
-        const detection = await faceApi.getDetectionForImage(this.state.video);
-        this.updateTimeStats(Date.now() - ts)
-
-        if (detection) {
-            const canvas = await faceApi.createCanvasFromHtmlVideo(this.state.video, detection);
-            utils.showResultsInContainer(this.state.video, canvas);
-        }
+        const ts = Date.now();
+        await this.props.recognizeFaces(this.state.video, true)
+        this.updateTimeStats(Date.now() - ts);
 
         setTimeout(() => this.onPlay())
     }
@@ -68,8 +66,8 @@ class WebCam extends React.Component {
                     id={constants.VIDEO_ID }
                     autoPlay muted playsInline
                 ></video>
-                <p>{`TIME: ${this.state.avgTime} ms`}</p>
-                <p>{`FPS: ${this.state.fps} ms`}</p>
+                <p>{`TIME: ${this.state.avgTime || "-"} ms`}</p>
+                <p>{`FPS: ${this.state.fps || "-"} ms`}</p>
             </div>
         )
     }

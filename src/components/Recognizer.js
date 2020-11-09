@@ -18,24 +18,12 @@ class Recognizer extends React.Component {
     }
 
     registerSubject = async (label, images) => {
-        let descriptors = await faceApi.getLabeledDescriptors(label, images);
-        let newLabeledDescriptors = this.state.labeledDescriptors;
-        newLabeledDescriptors.push(descriptors);
-        this.setState({
-            labeledDescriptors: newLabeledDescriptors
-        });
+        await faceApi.getLabeledDescriptors(label, images);
     }
 
-    recognizeFaces = async (image) => {
-        let canvas = await faceApi.createCanvasFromHtmlImage(image)
-        const detections = await faceApi.getAllDetectionsForImage(image);
-        if(this.state.labeledDescriptors.length > 0) {
-            const labeledDetections = await faceApi.detectSubjectsInImage(detections, this.state.labeledDescriptors);
-            await faceApi.drawLabeledDetectionsInCanvas(detections, labeledDetections, canvas);
-        }else{
-            await faceApi.drawDetectionsInCanvas(canvas, detections);
-        }
-        utils.showResultsInContainer(image, canvas);
+    recognizeFaces = async (media) => {
+        let canvas = await faceApi.createCanvasFromHtmlMedia(media)
+        utils.showResultsInContainer(media, canvas);
     }
 
     changeWebcamState = (activateWebcam) => this.setState({activateWebcam});
@@ -60,7 +48,7 @@ class Recognizer extends React.Component {
                 </Row>
                 <Row>
                     {this.state.activateWebcam &&
-                        <WebCam />
+                        <WebCam recognizeFaces={this.recognizeFaces}/>
                     }
                 </Row>
                 <div id="resultsContainer"></div>

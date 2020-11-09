@@ -4,6 +4,8 @@ import * as faceapi from '@vladmandic/face-api/dist/face-api.nobundle.js';
 
 import * as constants from '../constants';
 
+let labeledFaceDescriptors = [];
+
 export async function loadTensorFlow(backend = "webgl"){
     await setWasmPaths(constants.WASM_PATH);
     await tf.setBackend(backend);
@@ -21,6 +23,24 @@ export async function loadFaceApi(){
     .catch((error)=> console.error(constants.FACEAPI_ERROR_TEXT+error));
 }
 
+export async function createCanvasFromHtmlMedia(media){
+    const isImage = media instanceof HTMLImageElement;
+    if(isImage){
+        await faceapi.awaitMediaLoaded(media);
+        media = resizeMedia(media);
+    }
+    const canvas = await faceapi.createCanvasFromMedia(media);
+    const dimensions = await faceapi.matchDimensions(canvas, media, !isImage);
+    console.log(dimensions)
+    const detections = await getAllDetectionsForImage(media);
+    const resizedDetections = await faceapi.resizeResults(detections, dimensions);
+    if(labeledFaceDescriptors.length > 0) 
+        await drawLabeledDetectionsInCanvas(resizedDetections, canvas);
+    else
+        await drawDetectionsInCanvas(resizedDetections, canvas);
+    return canvas;
+}
+
 export async function getLabeledDescriptors(label, images) {
     let descriptorsForSubject = [];
     for(let i = 0; i<images.length; i++){
@@ -28,61 +48,45 @@ export async function getLabeledDescriptors(label, images) {
         let detection = await getDetectionForImage(images[i]);
         descriptorsForSubject.push(detection.descriptor);
     }
-    return new faceapi.LabeledFaceDescriptors(label, descriptorsForSubject);
+    const newDescriptors = await new faceapi.LabeledFaceDescriptors(label, descriptorsForSubject);
+    labeledFaceDescriptors.push(newDescriptors);
 }
 
-export async function getDetectionForImage(image) {
+async function getDetectionForImage(image) {
     return await faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor();
 }
 
-export async function getAllDetectionsForImage(image) {
-    let detections = await faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors();
-    const displaySize = getDisplaySize(image);
-    return faceapi.resizeResults(detections, displaySize);
+async function getAllDetectionsForImage(image) {
+    return await faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors();
 }
 
-export async function detectSubjectsInImage(detections, labeledFaceDescriptors) {
+async function detectSubjectsInImage(detections) {
     const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, constants.MAX_DESCRIPTOR_DISTANCE);
     return detections.map(detection =>
         faceMatcher.findBestMatch(detection.descriptor)
     );
 }
 
-export async function createCanvasFromHtmlImage(image){
-    await faceapi.awaitMediaLoaded(image);
-    const displaySize = getDisplaySize(image);
-    image.width = displaySize.width;
-    image.height = displaySize.height;
-    const canvas = await faceapi.createCanvasFromMedia(image);
-    faceapi.matchDimensions(canvas, displaySize);
-    return canvas;
+function resizeMedia(media) {
+    let width = constants.CANVAS_DISPLAY_WIDTH;
+    let height = (media.height*constants.CANVAS_DISPLAY_WIDTH)/media.width
+   
+    media.width = width;
+    media.height = height;
+    return media;
 }
 
-export async function createCanvasFromHtmlVideo(video, detection){
-    const canvas = await faceapi.createCanvasFromMedia(video);
-    const dims = faceapi.matchDimensions(canvas, video, true);
-    const resizedResult = faceapi.resizeResults(detection, dims);
-    drawDetectionsInCanvas(canvas, resizedResult);
-    return canvas;
-}
-
-export function drawDetectionsInCanvas(canvas, detections){
+function drawDetectionsInCanvas(detections, canvas){
     faceapi.draw.drawDetections(canvas, detections);
     faceapi.draw.drawFaceLandmarks(canvas, detections);
 }
 
-export async function drawLabeledDetectionsInCanvas(descriptions, detections, canvas) {
-    detections.forEach((detection, i) => {
-        const box = descriptions[i].detection.box;
+async function drawLabeledDetectionsInCanvas(detections, canvas) {
+    const labeledDetections = await detectSubjectsInImage(detections);
+    labeledDetections.forEach((detection, i) => {
+        const box = detections[i].detection.box;
         const text = detection.toString();
         const drawBox = new faceapi.draw.DrawBox(box, { label: text });
         drawBox.draw(canvas);
     })
-}
-
-export function getDisplaySize(image) {
-    return { 
-        width: constants.CANVAS_DISPLAY_WIDTH, 
-        height: (image.height*constants.CANVAS_DISPLAY_WIDTH)/image.width
-    }
 }

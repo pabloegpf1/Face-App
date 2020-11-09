@@ -10,5 +10,7 @@ export function showResultsInContainer(media, canvas) {
 
 export function cleanResultsContainer() {
     const resultContainer = document.getElementById(constants.RESULT_CONTAINER_ID);
-    resultContainer.innerHTML = "";
+    while (resultContainer.firstChild) {
+        resultContainer.removeChild(resultContainer.firstChild);
+    }
 }

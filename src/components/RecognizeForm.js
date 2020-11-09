@@ -18,13 +18,16 @@ class ProcessImageForm extends React.Component {
 
     handleProcessImageSubmit = async (event) => {
         event.preventDefault();
-        this.setState({showSpinner:true, buttonText: constants.PROCESSING_IMAGE_BUTTON_TEXT});
+        this.setState({
+            showSpinner:true, 
+            processImageButtonText: constants.PROCESSING_IMAGE_BUTTON_TEXT
+        });
         const image = document.createElement('img');
         image.src = this.state.imageUrl;
         await this.props.recognizeFaces(image);
         this.setState({
             showSpinner:false, 
-            buttonText:constants.PROCESS_IMAGE_BUTTON_TEXT
+            processImageButtonText:constants.PROCESS_IMAGE_BUTTON_TEXT
         });
     }
 
@@ -59,7 +62,7 @@ class ProcessImageForm extends React.Component {
                         />
                     </Col>
                     <Col>
-                        <Button id="processImageSubmit" type="submit">
+                        <Button id="processImageSubmit" type="submit" disabled={this.state.showWebcam}>
                             {this.state.processImageButtonText+" "}
                             <Spinner
                                 animation="border"
