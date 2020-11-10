@@ -1,13 +1,13 @@
 import * as tf from '@tensorflow/tfjs';
 import {setWasmPaths} from '@tensorflow/tfjs-backend-wasm';
-import * as faceapi from '@vladmandic/face-api/dist/face-api.nobundle.js';
 
+import * as faceapi from '@vladmandic/face-api/dist/face-api.nobundle.js';
 import * as constants from '../constants';
 
 let labeledFaceDescriptors = [];
 
 export async function loadTensorFlow(backend = "webgl"){
-    await setWasmPaths(constants.WASM_PATH);
+    setWasmPaths(constants.WASM_PATH);
     await tf.setBackend(backend);
     await tf.ready();
     console.log(tf)
@@ -16,8 +16,8 @@ export async function loadTensorFlow(backend = "webgl"){
 
 export async function loadFaceApi(){
     return Promise.all([
-        faceapi.nets.faceLandmark68Net.loadFromUri(constants.MODEL_PATH),
-        faceapi.nets.ssdMobilenetv1.loadFromUri(constants.MODEL_PATH),
+        faceapi.nets.tinyFaceDetector.loadFromUri(constants.MODEL_PATH),
+        faceapi.nets.faceLandmark68TinyNet.loadFromUri(constants.MODEL_PATH),
         faceapi.nets.faceRecognitionNet.loadFromUri(constants.MODEL_PATH),
     ])
     .catch((error)=> console.error(constants.FACEAPI_ERROR_TEXT+error));
@@ -31,7 +31,6 @@ export async function createCanvasFromHtmlMedia(media){
     }
     const canvas = await faceapi.createCanvasFromMedia(media);
     const dimensions = await faceapi.matchDimensions(canvas, media, !isImage);
-    console.log(dimensions)
     const detections = await getAllDetectionsForImage(media);
     const resizedDetections = await faceapi.resizeResults(detections, dimensions);
     if(labeledFaceDescriptors.length > 0) 
@@ -53,11 +52,11 @@ export async function getLabeledDescriptors(label, images) {
 }
 
 async function getDetectionForImage(image) {
-    return await faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor();
+    return await faceapi.detectSingleFace(image, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks(true).withFaceDescriptor();
 }
 
 async function getAllDetectionsForImage(image) {
-    return await faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors();
+    return await faceapi.detectAllFaces(image, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks(true).withFaceDescriptors();
 }
 
 async function detectSubjectsInImage(detections) {
