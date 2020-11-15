@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Button, Col, Spinner } from 'react-bootstrap';
 
-import * as constants from '../constants';
+import * as constants from '../../constants';
 
 class ProcessImageForm extends React.Component {
 
@@ -24,7 +24,7 @@ class ProcessImageForm extends React.Component {
         });
         const image = document.createElement('img');
         image.src = this.state.imageUrl;
-        await this.props.recognizeFaces(image);
+        await this.props.recognizeFaces({media: image, isImage: true});
         this.setState({
             showSpinner:false, 
             processImageButtonText:constants.PROCESS_IMAGE_BUTTON_TEXT

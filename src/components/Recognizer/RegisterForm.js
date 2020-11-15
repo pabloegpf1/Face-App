@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Button, Col, Spinner } from 'react-bootstrap';
 
-import * as constants from '../constants';
+import * as constants from '../../constants';
 
 class RegisterSubjectForm extends React.Component {
 

@@ -23,16 +23,15 @@ export async function loadFaceApi(){
     .catch((error)=> console.error(constants.FACEAPI_ERROR_TEXT+error));
 }
 
-export async function createCanvasFromHtmlMedia(media){
-    const isImage = media instanceof HTMLImageElement;
+export async function createCanvasFromHtmlMedia({media, isImage}){
     if(isImage){
         await faceapi.awaitMediaLoaded(media);
         media = resizeMedia(media);
     }
     const canvas = await faceapi.createCanvasFromMedia(media);
     const dimensions = await faceapi.matchDimensions(canvas, media, !isImage);
-    const detections = await getAllDetectionsForImage(media);
-    const resizedDetections = await faceapi.resizeResults(detections, dimensions);
+    const detection = await getAllDetectionsForImage(media);
+    const resizedDetections = await faceapi.resizeResults(detection, dimensions);
     if(labeledFaceDescriptors.length > 0) 
         await drawLabeledDetectionsInCanvas(resizedDetections, canvas);
     else

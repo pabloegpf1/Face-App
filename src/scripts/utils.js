@@ -1,16 +1,44 @@
 import * as constants from '../constants';
 
-export function showResultsInContainer(media, canvas) {
-    const resultContainer = document.getElementById(constants.RESULT_CONTAINER_ID);
-    cleanResultsContainer();
-    if(media) resultContainer.append(media);
-    if(canvas) resultContainer.append(canvas);
-    media.hidden = false;
+export const showResultsInContainer = ({media, isImage, canvas}) => {
+    clearImageContents();
+    const resultContainter = document.getElementById(constants.RESULT_CONTAINER_ID);
+    const resultCanvas = document.getElementById(constants.CANVAS_ID);
+    const resultMedia = getResultMediaElement(isImage);
+    canvas.id = constants.CANVAS_ID;
+    media.id = resultMedia.id;
+    resultContainter.replaceChild(media, resultMedia);
+    resultContainter.replaceChild(canvas, resultCanvas);
+    resultMedia.hidden = false;
+    resultCanvas.hidden = false;
 }
 
-export function cleanResultsContainer() {
-    const resultContainer = document.getElementById(constants.RESULT_CONTAINER_ID);
-    while (resultContainer.firstChild) {
-        resultContainer.removeChild(resultContainer.firstChild);
-    }
+export const clearResultsContainer = () => {
+    clearImageContents();
+    clearVideoContents();
+    clearCanvasContents();
+}
+
+const getResultMediaElement = (isImage) => {
+    const mediaId = isImage ? constants.IMAGE_ID : constants.VIDEO_ID;
+    const resultElement = document.getElementById(mediaId);
+    return resultElement;
+}
+
+const clearImageContents = () => {
+    const resultImage = document.getElementById(constants.IMAGE_ID);
+    resultImage.hidden = true;
+}
+
+const clearCanvasContents = () => {
+    const resultCanvas = document.getElementById(constants.CANVAS_ID);
+    const canvasContext = resultCanvas.getContext('2d');
+    canvasContext.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
+    resultCanvas.hidden = true;
+}
+
+const clearVideoContents = () => {
+    const resultVideo = document.getElementById(constants.VIDEO_ID);
+    resultVideo.srcObject = null;
+    resultVideo.hidden = true;
 }

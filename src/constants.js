@@ -12,8 +12,10 @@ export const WASM_PATH = './wasm/'
 export const FACEAPI_ERROR_TEXT = "Error loading Faceapi: ";
 
 //HTML
-export const RESULT_CONTAINER_ID = "resultsContainer";
-export const VIDEO_ID = "inputVideo";
+export const RESULT_CONTAINER_ID = "resultContainer";
+export const VIDEO_ID = "resultVideo";
+export const IMAGE_ID = "resultImage";
+export const CANVAS_ID = "resultCanvas";
 export const BUTTON_SUCCESS_VARIANT = "success";
 export const BUTTON_DANGER_VARIANT = "danger";
 

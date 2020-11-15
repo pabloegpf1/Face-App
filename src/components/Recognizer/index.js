@@ -4,8 +4,8 @@ import RecognizeForm from './RecognizeForm';
 import RegisterForm from './RegisterForm';
 import WebCam from './WebCam';
 
-import * as faceApi from '../scripts/faceApi.js';
-import * as utils from '../scripts/utils.js';
+import * as faceApi from '../../scripts/faceApi.js';
+import * as utils from '../../scripts/utils.js';
 
 class Recognizer extends React.Component {
 
@@ -21,9 +21,9 @@ class Recognizer extends React.Component {
         await faceApi.getLabeledDescriptors(label, images);
     }
 
-    recognizeFaces = async (media) => {
-        let canvas = await faceApi.createCanvasFromHtmlMedia(media)
-        utils.showResultsInContainer(media, canvas);
+    recognizeFaces = async ({media, isImage}) => {
+        let canvas = await faceApi.createCanvasFromHtmlMedia({media, isImage});
+        utils.showResultsInContainer({media, canvas, isImage});
     }
 
     changeWebcamState = (activateWebcam) => this.setState({activateWebcam});
@@ -46,12 +46,12 @@ class Recognizer extends React.Component {
                         />
                     </Col>
                 </Row>
-                <Row>
-                    {this.state.activateWebcam &&
-                        <WebCam recognizeFaces={this.recognizeFaces}/>
-                    }
-                </Row>
-                <div id="resultsContainer"></div>
+                {this.state.activateWebcam &&
+                    <WebCam 
+                        recognizeFaces={this.recognizeFaces}
+                        updateTimeStats={this.props.updateTimeStats}
+                    />
+                }
             </div>
         )
 

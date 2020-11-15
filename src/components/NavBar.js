@@ -7,6 +7,13 @@ function NavbarComponent(props) {
     return (
         <Navbar bg="dark" variant="dark">
             <Navbar.Brand>Face App</Navbar.Brand>
+            {props.stats &&
+                <Navbar.Text>
+                    {"First frame: " + props.stats.firstFrame}
+                    {" | Average Time: " + props.stats.averageTime + " ms"}
+                    {" | " + props.stats.fps + " fps"}
+                </Navbar.Text>
+            }
             <Navbar.Collapse className="justify-content-end">
                 <ButtonGroup size="sm" className="mb-2">
                     <Button 
