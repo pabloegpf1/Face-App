@@ -7,6 +7,7 @@ export const REGISTERING_BUTTON_TEXT = "Registering";
 //Face-api
 export const MAX_DESCRIPTOR_DISTANCE = 0.6; 
 export const CANVAS_DISPLAY_WIDTH = 750;
+export const FACE_DETECTOR_INPUT_SIZE = 96;
 export const MODEL_PATH = './models/'
 export const WASM_PATH = './wasm/'
 export const FACEAPI_ERROR_TEXT = "Error loading Faceapi: ";

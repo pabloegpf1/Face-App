@@ -4,7 +4,9 @@ import {setWasmPaths} from '@tensorflow/tfjs-backend-wasm';
 import * as faceapi from '@vladmandic/face-api/dist/face-api.esm.nobundle.js';
 import * as constants from '../constants';
 
-let labeledFaceDescriptors = JSON.parse(localStorage.getItem(constants.FACE_DESCRIPTORS_KEY)) || [];
+const faceDetectorOptions = {inputSize: constants.FACE_DETECTOR_INPUT_SIZE};
+const useTinyModel = true;
+let labeledFaceDescriptors = [];
 
 export async function loadTensorFlow(backend = constants.WEBGL_BACKEND){
     setWasmPaths(constants.WASM_PATH);
@@ -15,17 +17,8 @@ export async function loadTensorFlow(backend = constants.WEBGL_BACKEND){
 }
 
 export async function loadFaceApi(){
-    await labeledFaceDescriptors.forEach((subject, index) => {
-        return subject.descriptors[index] = Float32Array.from(subject.descriptors[index])
-    })
+    await loadLabeledDescriptorsFromLocalStorage();
     console.log(labeledFaceDescriptors)
-    labeledFaceDescriptors.forEach((subject, index) => {
-        labeledFaceDescriptors[index] = new faceapi.LabeledFaceDescriptors(
-            subject.label,
-            subject.descriptors
-        );
-    })
-    //labeledFaceDescriptors.map((descriptor) => console.log({...descriptor}))
     return Promise.all([
         faceapi.loadTinyFaceDetectorModel(constants.MODEL_PATH),
         faceapi.loadFaceLandmarkTinyModel(constants.MODEL_PATH),
@@ -54,21 +47,41 @@ export async function getLabeledDescriptors(label, images) {
     let descriptorsForSubject = [];
     for(let i = 0; i<images.length; i++){
         await faceapi.awaitMediaLoaded(images[i]);
-        let detection = await getDetectionForImage(images[i]);
+        const detection = await getDetectionForImage(images[i]);
         descriptorsForSubject.push(detection.descriptor);
     }
     const newDescriptors = await new faceapi.LabeledFaceDescriptors(label, descriptorsForSubject);
     labeledFaceDescriptors.push(newDescriptors);
-    localStorage.setItem(constants.FACE_DESCRIPTORS_KEY, JSON.stringify(labeledFaceDescriptors))
-    console.log(labeledFaceDescriptors);
+    saveLabeledDescriptorsInLocalStorage();
+}
+
+async function loadLabeledDescriptorsFromLocalStorage() {
+    const loadedDescriptors = await JSON.parse(localStorage.getItem(constants.FACE_DESCRIPTORS_KEY));
+    loadedDescriptors.forEach(async (subject) => {
+        const newSubject = new faceapi.LabeledFaceDescriptors(
+            subject.label,
+            await subject.descriptors.map((descriptor) => Float32Array.from(descriptor))
+        );
+        labeledFaceDescriptors.push(newSubject);
+    });
+}
+
+async function saveLabeledDescriptorsInLocalStorage() {
+    return localStorage.setItem(constants.FACE_DESCRIPTORS_KEY, JSON.stringify(labeledFaceDescriptors))
 }
 
 async function getDetectionForImage(image) {
-    return await faceapi.detectSingleFace(image, new faceapi.TinyFaceDetectorOptions({ inputSize: 96 })).withFaceLandmarks(true).withFaceDescriptor();
+    return await faceapi
+        .detectSingleFace(image, new faceapi.TinyFaceDetectorOptions(faceDetectorOptions))
+        .withFaceLandmarks(useTinyModel)
+        .withFaceDescriptor();
 }
 
 async function getAllDetectionsForImage(image) {
-    return await faceapi.detectAllFaces(image, new faceapi.TinyFaceDetectorOptions({ inputSize: 96 })).withFaceLandmarks(true).withFaceDescriptors();
+    return await faceapi
+        .detectAllFaces(image, new faceapi.TinyFaceDetectorOptions(faceDetectorOptions))
+        .withFaceLandmarks(useTinyModel)
+        .withFaceDescriptors();
 }
 
 async function detectSubjectsInImage(detections) {
@@ -79,9 +92,8 @@ async function detectSubjectsInImage(detections) {
 }
 
 function resizeMedia(media) {
-    let width = constants.CANVAS_DISPLAY_WIDTH;
-    let height = (media.height*constants.CANVAS_DISPLAY_WIDTH)/media.width
-   
+    const width = constants.CANVAS_DISPLAY_WIDTH;
+    const height = (media.height*constants.CANVAS_DISPLAY_WIDTH)/media.width
     media.width = width;
     media.height = height;
     return media;
