@@ -1,7 +1,7 @@
 import * as tf from '@tensorflow/tfjs';
 import {setWasmPaths} from '@tensorflow/tfjs-backend-wasm';
 
-import * as faceapi from '@vladmandic/face-api/dist/face-api.nobundle.js';
+import * as faceapi from '@vladmandic/face-api/dist/face-api.esm.nobundle.js';
 import * as constants from '../constants';
 
 let labeledFaceDescriptors = [];
@@ -16,11 +16,11 @@ export async function loadTensorFlow(backend = "webgl"){
 
 export async function loadFaceApi(){
     return Promise.all([
-        faceapi.nets.tinyFaceDetector.loadFromUri(constants.MODEL_PATH),
-        faceapi.nets.faceLandmark68TinyNet.loadFromUri(constants.MODEL_PATH),
-        faceapi.nets.faceRecognitionNet.loadFromUri(constants.MODEL_PATH),
+        faceapi.loadTinyFaceDetectorModel(constants.MODEL_PATH),
+        faceapi.loadFaceLandmarkTinyModel(constants.MODEL_PATH),
+        faceapi.loadFaceRecognitionModel(constants.MODEL_PATH),
     ])
-    .catch((error)=> console.error(constants.FACEAPI_ERROR_TEXT+error));
+    .catch((error)=> console.error(constants.FACEAPI_ERROR_TEXT, error));
 }
 
 export async function createCanvasFromHtmlMedia({media, isImage}){
