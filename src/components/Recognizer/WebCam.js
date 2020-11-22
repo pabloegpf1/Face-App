@@ -17,7 +17,7 @@ class WebCam extends React.Component {
     }
 
     startWebcam = async () => {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: {width: 192, height: 192,facingMode: "user"}, audio: false });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: {"height":{"exact":192},"mediaSource":"camera","width":{"exact":192}} });
         const video = document.getElementById("resultVideo");
         video.onloadeddata = this.onPlay;
         video.srcObject = stream;

@@ -9,8 +9,6 @@ export const showResultsInContainer = ({media, isImage, canvas}) => {
     media.id = resultMedia.id;
     resultContainter.replaceChild(media, resultMedia);
     resultContainter.replaceChild(canvas, resultCanvas);
-    resultMedia.hidden = false;
-    resultCanvas.hidden = false;
 }
 
 export const clearResultsContainer = () => {
@@ -27,18 +25,16 @@ const getResultMediaElement = (isImage) => {
 
 const clearImageContents = () => {
     const resultImage = document.getElementById(constants.IMAGE_ID);
-    resultImage.hidden = true;
+    resultImage.removeAttribute("src")
 }
 
 const clearCanvasContents = () => {
     const resultCanvas = document.getElementById(constants.CANVAS_ID);
     const canvasContext = resultCanvas.getContext('2d');
     canvasContext.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
-    resultCanvas.hidden = true;
 }
 
 const clearVideoContents = () => {
     const resultVideo = document.getElementById(constants.VIDEO_ID);
     resultVideo.srcObject = null;
-    resultVideo.hidden = true;
 }
