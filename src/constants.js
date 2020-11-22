@@ -10,6 +10,7 @@ export const CANVAS_DISPLAY_WIDTH = 750;
 export const MODEL_PATH = './models/'
 export const WASM_PATH = './wasm/'
 export const FACEAPI_ERROR_TEXT = "Error loading Faceapi: ";
+export const FACE_DESCRIPTORS_KEY = "labeledFaceDescriptors"
 
 //HTML
 export const RESULT_CONTAINER_ID = "resultContainer";
