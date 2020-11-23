@@ -56,7 +56,7 @@ export async function getLabeledDescriptors(label, images) {
 
 async function loadLabeledDescriptorsFromLocalStorage() {
     const loadedDescriptors = await JSON.parse(localStorage.getItem(constants.FACE_DESCRIPTORS_KEY));
-    if(!localStorage) return;
+    if(!loadedDescriptors) return;
     loadedDescriptors.map(async (subject) => {
         const newSubject = new faceapi.LabeledFaceDescriptors(
             subject.label,
