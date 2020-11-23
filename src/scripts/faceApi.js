@@ -18,7 +18,6 @@ export async function loadTensorFlow(backend = constants.WEBGL_BACKEND){
 
 export async function loadFaceApi(){
     await loadLabeledDescriptorsFromLocalStorage();
-    console.log(labeledFaceDescriptors)
     return Promise.all([
         faceapi.loadTinyFaceDetectorModel(constants.MODEL_PATH),
         faceapi.loadFaceLandmarkTinyModel(constants.MODEL_PATH),
@@ -57,7 +56,8 @@ export async function getLabeledDescriptors(label, images) {
 
 async function loadLabeledDescriptorsFromLocalStorage() {
     const loadedDescriptors = await JSON.parse(localStorage.getItem(constants.FACE_DESCRIPTORS_KEY));
-    loadedDescriptors.forEach(async (subject) => {
+    if(!localStorage) return;
+    loadedDescriptors.map(async (subject) => {
         const newSubject = new faceapi.LabeledFaceDescriptors(
             subject.label,
             await subject.descriptors.map((descriptor) => Float32Array.from(descriptor))
