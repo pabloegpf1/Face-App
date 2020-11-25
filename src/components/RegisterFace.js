@@ -1,9 +1,9 @@
 import React from 'react';
-import { Form, Button, Col, Spinner } from 'react-bootstrap';
+import { Form, Button, Spinner } from 'react-bootstrap';
 
-import * as constants from '../../constants';
+import * as constants from '../constants';
 
-class RegisterSubjectForm extends React.Component {
+class RegisterFace extends React.Component {
 
     constructor() {
         super();
@@ -42,37 +42,35 @@ class RegisterSubjectForm extends React.Component {
     render() {
         return (
             <Form id="registerSubjectForm" onSubmit={this.handleRegisterSubjectSubmit}>
-                <Form.Row>
-                    <Col>
-                        <Form.Control 
-                            type="text" 
-                            placeholder="Name" 
-                            onChange={this.handleSubjectLabelUpdate}
+                <Form.Group>
+                    <Form.Control 
+                        type="text" 
+                        placeholder="Name" 
+                        onChange={this.handleSubjectLabelUpdate}
+                    />
+                </Form.Group>
+                <Form.Group>
+                    <Form.File 
+                        id="subjectImages" 
+                        label="Images of subject" 
+                        onChange={this.handleSubjectImagesUpdate}
+                        custom
+                        multiple
+                    />
+                </Form.Group>
+                <Form.Group>
+                    <Button id="subjectImagesSubmit" type="submit">
+                        {this.state.buttonText+" "}
+                        <Spinner
+                            animation="border"
+                            size="sm"
+                            hidden={!this.state.showSpinner}
                         />
-                    </Col>
-                    <Col>
-                        <Form.File 
-                            id="subjectImages" 
-                            label="Images of subject" 
-                            onChange={this.handleSubjectImagesUpdate}
-                            custom
-                            multiple
-                        />
-                    </Col>
-                    <Col>
-                        <Button id="subjectImagesSubmit" type="submit">
-                            {this.state.buttonText+" "}
-                            <Spinner
-                                animation="border"
-                                size="sm"
-                                hidden={!this.state.showSpinner}
-                            />
-                        </Button>
-                    </Col>
-                </Form.Row>
+                    </Button>
+                </Form.Group>
             </Form>
         )
     }
 }
 
-export default RegisterSubjectForm;
+export default RegisterFace;

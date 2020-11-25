@@ -1,7 +1,8 @@
 import React from 'react';
 
-import * as utils from '../../scripts/utils.js';
-import * as benchmark from '../../scripts/benchmark.js';
+import * as utils from '../scripts/utils.js';
+import * as benchmark from '../scripts/benchmark.js';
+import * as constants from '../constants.js';
 
 class WebCam extends React.Component {
 
@@ -17,8 +18,9 @@ class WebCam extends React.Component {
     }
 
     startWebcam = async () => {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: {"height":{"exact":192},"mediaSource":"camera","width":{"exact":192}} });
-        const video = document.getElementById("resultVideo");
+        const stream = await navigator.mediaDevices.getUserMedia({ video: {"height":{"exact":300},"mediaSource":"camera","width":{"exact":300}} });
+        const video = document.getElementById(constants.VIDEO_ID);
+        if(!video) return;
         video.onloadeddata = this.onPlay;
         video.srcObject = stream;
         benchmark.clearStats();

@@ -1,7 +1,6 @@
 import * as constants from '../constants';
 
 export const showResultsInContainer = ({media, isImage, canvas}) => {
-    clearImageContents();
     const resultContainter = document.getElementById(constants.RESULT_CONTAINER_ID);
     const resultCanvas = document.getElementById(constants.CANVAS_ID);
     const resultMedia = getResultMediaElement(isImage);
@@ -25,16 +24,18 @@ const getResultMediaElement = (isImage) => {
 
 const clearImageContents = () => {
     const resultImage = document.getElementById(constants.IMAGE_ID);
-    resultImage.removeAttribute("src")
+    if(resultImage) resultImage.src = "//:0";
 }
 
 const clearCanvasContents = () => {
     const resultCanvas = document.getElementById(constants.CANVAS_ID);
-    const canvasContext = resultCanvas.getContext('2d');
-    canvasContext.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
+    if(resultCanvas) {
+        const canvasContext = resultCanvas.getContext('2d');
+        canvasContext.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
+    }
 }
 
 const clearVideoContents = () => {
     const resultVideo = document.getElementById(constants.VIDEO_ID);
-    resultVideo.srcObject = null;
+    if(resultVideo) resultVideo.srcObject = null;
 }

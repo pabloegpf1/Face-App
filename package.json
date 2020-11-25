@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@tensorflow/tfjs": "2.6.0",
-    "@tensorflow/tfjs-backend-wasm": "2.6.0",
-    "@tensorflow/tfjs-core": "2.6.0",
+    "@tensorflow/tfjs": "2.7.0",
+    "@tensorflow/tfjs-backend-wasm": "2.7.0",
+    "@tensorflow/tfjs-core": "2.7.0",
     "@vladmandic/face-api": "0.8.8",
     "bootstrap": "^4.5.2",
     "popper.js": "^1.16.1",

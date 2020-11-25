@@ -1,9 +1,9 @@
 import React from 'react';
-import { Form, Button, Col, Spinner } from 'react-bootstrap';
+import { Form, Button, Spinner } from 'react-bootstrap';
 
-import * as constants from '../../constants';
+import * as constants from '../constants';
 
-class ProcessImageForm extends React.Component {
+class AnalyzeImage extends React.Component {
 
     constructor() {
         super();
@@ -50,35 +50,29 @@ class ProcessImageForm extends React.Component {
 
     render() {
         return (
-            <Form id="processImageForm" onSubmit={this.handleProcessImageSubmit}>
-                <Form.Row>
-                    <Col>
-                        <Form.File 
-                            type="file" 
-                            id="processImage" 
-                            label="Image to process"
-                            onChange={this.handleImageUpdate}
-                            custom
+            <Form id="analyzeImageForm" onSubmit={this.handleProcessImageSubmit}>
+                <Form.Group>
+                    <Form.File 
+                        type="file" 
+                        id="processImage" 
+                        label="Image to process"
+                        onChange={this.handleImageUpdate}
+                        custom
+                    />
+                </Form.Group>
+                <Form.Group>
+                    <Button id="processImageSubmit" type="submit" disabled={this.state.showWebcam}>
+                        {this.state.processImageButtonText+" "}
+                        <Spinner
+                            animation="border"
+                            size="sm"
+                            hidden={!this.state.showSpinner}
                         />
-                    </Col>
-                    <Col>
-                        <Button id="processImageSubmit" type="submit" disabled={this.state.showWebcam}>
-                            {this.state.processImageButtonText+" "}
-                            <Spinner
-                                animation="border"
-                                size="sm"
-                                hidden={!this.state.showSpinner}
-                            />
-                        </Button>
-                        &nbsp;
-                        <Button onClick={this.changeWebcamState} variant={this.state.webcamButtonVariant}>
-                            {this.state.webcamButtonText+" "}
-                        </Button>
-                    </Col>
-                </Form.Row>
+                    </Button>
+                </Form.Group>
             </Form>
         )
     }
 }
 
-export default ProcessImageForm;
+export default AnalyzeImage;

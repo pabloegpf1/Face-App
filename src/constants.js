@@ -4,12 +4,21 @@ export const PROCESS_IMAGE_BUTTON_TEXT = "Process";
 export const PROCESSING_IMAGE_BUTTON_TEXT = "Processing";
 export const REGISTER_BUTTON_TEXT = "Register";
 export const REGISTERING_BUTTON_TEXT = "Registering";
+export const WEBCAM_TOOL_KEY = "webcam";
+export const REGISTER_FACE_TOOL_KEY = "registerFace";
+export const ANALYZE_IMAGE_TOOL_KEY = "analyzeImage";
+export const FACE_API_ERROR_TEXT = "Error loading TensorFlow";
+
 //Face-api
+export const WASM_BACKEND = "wasm";
+export const CPU_BACKEND = "cpu";
+export const WEBGL_BACKEND = "webgl";
 export const MAX_DESCRIPTOR_DISTANCE = 0.6; 
 export const CANVAS_DISPLAY_WIDTH = 750;
 export const FACE_DETECTOR_INPUT_SIZE = 96;
 export const MODEL_PATH = './models/'
 export const WASM_PATH = './wasm/'
+export const BASE_URL = "/Face-App?backend=";
 export const FACEAPI_ERROR_TEXT = "Error loading Faceapi: ";
 export const FACE_DESCRIPTORS_KEY = "labeledFaceDescriptors"
 
@@ -20,8 +29,3 @@ export const IMAGE_ID = "resultImage";
 export const CANVAS_ID = "resultCanvas";
 export const BUTTON_SUCCESS_VARIANT = "success";
 export const BUTTON_DANGER_VARIANT = "danger";
-
-export const WASM_BACKEND = "wasm";
-export const CPU_BACKEND = "cpu";
-export const WEBGL_BACKEND = "webgl";
-export const BASE_URL = "/Face-App?backend=";

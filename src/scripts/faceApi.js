@@ -1,7 +1,6 @@
-import * as tf from '@tensorflow/tfjs';
 import {setWasmPaths} from '@tensorflow/tfjs-backend-wasm';
 
-import * as faceapi from '@vladmandic/face-api/dist/face-api.esm.nobundle.js';
+import * as faceapi from '@vladmandic/face-api/dist/face-api.esm.js';
 import * as constants from '../constants';
 
 const faceDetectorOptions = {inputSize: constants.FACE_DETECTOR_INPUT_SIZE};
@@ -9,11 +8,10 @@ const useTinyModel = true;
 let labeledFaceDescriptors = [];
 
 export async function loadTensorFlow(backend = constants.WEBGL_BACKEND){
-    setWasmPaths(constants.WASM_PATH);
-    await tf.setBackend(backend);
-    await tf.ready();
-    console.log(tf)
-    return tf;
+    await setWasmPaths(constants.WASM_PATH);
+    await faceapi.tf.setBackend(backend);
+    await faceapi.tf.ready();
+    return faceapi.tf;
 }
 
 export async function loadFaceApi(){
