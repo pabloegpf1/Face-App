@@ -32,6 +32,7 @@ export async function createCanvasFromHtmlMedia({media, isImage}){
     const canvas = await faceapi.createCanvasFromMedia(media);
     const dimensions = await faceapi.matchDimensions(canvas, media, !isImage);
     const detections = await getAllDetectionsForImage(media);
+    if(detections.length === 0) return;
     const resizedDetections = await faceapi.resizeResults(detections, dimensions);
     if(labeledFaceDescriptors.length > 0) 
         await drawLabeledDetectionsInCanvas(resizedDetections, canvas);

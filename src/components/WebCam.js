@@ -39,9 +39,10 @@ class WebCam extends React.Component {
             return setTimeout(() => this.onPlay())
 
         const ts = Date.now();
-        await this.props.recognizeFaces({media: this.state.video, isImage: false});
-        this.props.updateTimeStats(Date.now() - ts);
-
+        if(await this.props.recognizeFaces({media: this.state.video, isImage: false})){
+            this.props.updateTimeStats(Date.now() - ts);
+        }
+        
         setTimeout(() => this.onPlay())
     }
 

@@ -45,13 +45,25 @@ class App extends React.Component {
 
     recognizeFaces = async ({media, isImage}) => {
         let canvas = await faceApi.createCanvasFromHtmlMedia({media, isImage});
-        utils.showResultsInContainer({media, canvas, isImage});
+        if(canvas){
+            utils.showResultsInContainer({media, canvas, isImage});
+            return true;
+        }
+        return false;
     }
 
     changeCurrentTool = (currentTool) => {
         utils.clearResultsContainer();
-        this.setState({currentTool});
-    } 
+        this.setState({currentTool, stats: null});
+    }
+
+    getStatsText = () => {
+        if(!this.state.stats) return;
+        return `First Frame: ${this.state.stats.firstFrame} ms` +
+        ` | Average Time: ${this.state.stats.averageTime} ms` +
+        ` | New Time: ${this.state.stats.newTime} ms` +
+        ` | ${this.state.stats.fps} fps`
+    }
 
     getCurrentTool = () => {
         switch (this.state.currentTool) {
@@ -93,12 +105,14 @@ class App extends React.Component {
                     <Navbar 
                         changeCurrentTool={this.changeCurrentTool}
                         tfBackend={this.state.tfBackend} 
-                        stats={this.state.stats}
                     />
                     <div className="center">
                         {this.getCurrentTool()}
                     </div>
                     <Results/>
+                    <p className="stats">
+                        {this.getStatsText()}
+                    </p>
                 </div>
             );
         } 
