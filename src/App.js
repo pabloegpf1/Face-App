@@ -7,13 +7,13 @@ import WebCam from './components/WebCam';
 import Navbar from './components/NavBar';
 import Results from './components/Results';
 
-import {loadTensorFlow, loadFaceApi} from './scripts/faceApi';
 import * as benchmark from './scripts/benchmark.js';
 import * as faceApi from './scripts/faceApi.js';
 import * as utils from './scripts/utils.js';
 import * as constants from './constants.js';
 
 const BACKEND = new URLSearchParams(window.location.search).get('backend') || 'webgl';
+let faceApiServer;
 
 class App extends React.Component {
 
@@ -27,9 +27,17 @@ class App extends React.Component {
     }
 
     componentDidMount(){
-        loadTensorFlow(BACKEND)
+        if(BACKEND === constants.SERVER_BACKEND){
+            faceApiServer = require('./scripts/faceApiServer.js');
+        } else {
+            this.loadFaceApi();
+        }
+    }
+
+    loadFaceApi = () => {
+        faceApi.loadTensorFlow(BACKEND)
         .then((tf) => this.setState({tensorflowReady: true, tfBackend: tf.getBackend()}))
-        .then(() => loadFaceApi())
+        .then(() => faceApi.loadFaceApi())
         .then(() => this.setState({faceApiReady: true}))
         .catch((error) => console.error(constants.FACE_API_ERROR_TEXT, error));
     }
@@ -43,13 +51,17 @@ class App extends React.Component {
         await faceApi.getLabeledDescriptors(label, images);
     }
 
-    recognizeFaces = async ({media, isImage}) => {
-        let canvas = await faceApi.createCanvasFromHtmlMedia({media, isImage});
-        if(canvas){
-            utils.showResultsInContainer({media, canvas, isImage});
-            return true;
+    recognizeFaces = async (base64image) => {
+        const ts = Date.now();
+        let successfulDetection = false;
+        if(BACKEND === constants.SERVER_BACKEND){
+            successfulDetection = await faceApiServer.sendImageToServer(base64image);
+        } else {
+            successfulDetection = await faceApi.createCanvasFromHtmlMedia(base64image);
         }
-        return false;
+        if(successfulDetection) {
+            this.updateTimeStats(Date.now() - ts);
+        }
     }
 
     changeCurrentTool = (currentTool) => {
@@ -71,7 +83,6 @@ class App extends React.Component {
                 return (
                     <WebCam 
                         recognizeFaces={this.recognizeFaces}
-                        updateTimeStats={this.updateTimeStats}
                     />
                 )
             case constants.REGISTER_FACE_TOOL_KEY:
@@ -93,10 +104,10 @@ class App extends React.Component {
     }
 
     render() {
-        if(!this.state.tensorflowReady){
+        if(!this.state.tensorflowReady && BACKEND !== constants.SERVER_BACKEND){
             return (<p>Loading TensorFlow...</p>)
         }
-        if(!this.state.faceApiReady){
+        if(!this.state.faceApiReady && BACKEND !== constants.SERVER_BACKEND){
             return (<p>Loading FaceApi...</p>)
         }
         else{
@@ -104,7 +115,7 @@ class App extends React.Component {
                 <div className="App">
                     <Navbar 
                         changeCurrentTool={this.changeCurrentTool}
-                        tfBackend={this.state.tfBackend} 
+                        tfBackend={this.state.tfBackend || BACKEND} 
                     />
                     <div className="center">
                         {this.getCurrentTool()}

@@ -1,6 +1,7 @@
 import {setWasmPaths} from '@tensorflow/tfjs-backend-wasm';
 
 import * as faceapi from '@vladmandic/face-api/dist/face-api.esm.js';
+import * as utils from './utils';
 import * as constants from '../constants';
 
 const faceDetectorOptions = {inputSize: constants.FACE_DETECTOR_INPUT_SIZE};
@@ -24,21 +25,22 @@ export async function loadFaceApi(){
     .catch((error)=> console.error(constants.FACEAPI_ERROR_TEXT, error));
 }
 
-export async function createCanvasFromHtmlMedia({media, isImage}){
-    if(isImage){
-        await faceapi.awaitMediaLoaded(media);
-        media = resizeMedia(media);
-    }
+export async function createCanvasFromHtmlMedia(base64image){
+    const image = new Image();
+    image.src = base64image;
+    const media = await utils.resizeMedia(image);
     const canvas = await faceapi.createCanvasFromMedia(media);
-    const dimensions = await faceapi.matchDimensions(canvas, media, !isImage);
+    const dimensions = await faceapi.matchDimensions(canvas, media);
     const detections = await getAllDetectionsForImage(media);
-    if(detections.length === 0) return;
+    if(detections.length === 0) return false;
     const resizedDetections = await faceapi.resizeResults(detections, dimensions);
-    if(labeledFaceDescriptors.length > 0) 
+    if(labeledFaceDescriptors.length > 0) {
         await drawLabeledDetectionsInCanvas(resizedDetections, canvas);
-    else
+    } else {
         await drawDetectionsInCanvas(resizedDetections, canvas);
-    return canvas;
+    }
+    utils.showResultsInContainer({media, canvas});
+    return true;
 }
 
 export async function getLabeledDescriptors(label, images) {
@@ -50,11 +52,25 @@ export async function getLabeledDescriptors(label, images) {
     }
     const newDescriptors = await new faceapi.LabeledFaceDescriptors(label, descriptorsForSubject);
     labeledFaceDescriptors.push(newDescriptors);
-    saveLabeledDescriptorsInLocalStorage();
+    utils.saveLabeledDescriptorsInLocalStorage(labeledFaceDescriptors);
+}
+
+export async function getAllDetectionsForImage(image) {
+    return await faceapi
+        .detectAllFaces(image, new faceapi.TinyFaceDetectorOptions(faceDetectorOptions))
+        .withFaceLandmarks(useTinyModel)
+        .withFaceDescriptors();
+}
+
+async function getDetectionForImage(image) {
+    return await faceapi
+        .detectSingleFace(image, new faceapi.TinyFaceDetectorOptions(faceDetectorOptions))
+        .withFaceLandmarks(useTinyModel)
+        .withFaceDescriptor();
 }
 
 async function loadLabeledDescriptorsFromLocalStorage() {
-    const loadedDescriptors = await JSON.parse(localStorage.getItem(constants.FACE_DESCRIPTORS_KEY));
+    const loadedDescriptors = await utils.getItemFromLocalStorage(constants.FACE_DESCRIPTORS_KEY);
     if(!loadedDescriptors) return;
     loadedDescriptors.map(async (subject) => {
         const newSubject = new faceapi.LabeledFaceDescriptors(
@@ -65,37 +81,11 @@ async function loadLabeledDescriptorsFromLocalStorage() {
     });
 }
 
-async function saveLabeledDescriptorsInLocalStorage() {
-    return localStorage.setItem(constants.FACE_DESCRIPTORS_KEY, JSON.stringify(labeledFaceDescriptors))
-}
-
-async function getDetectionForImage(image) {
-    return await faceapi
-        .detectSingleFace(image, new faceapi.TinyFaceDetectorOptions(faceDetectorOptions))
-        .withFaceLandmarks(useTinyModel)
-        .withFaceDescriptor();
-}
-
-async function getAllDetectionsForImage(image) {
-    return await faceapi
-        .detectAllFaces(image, new faceapi.TinyFaceDetectorOptions(faceDetectorOptions))
-        .withFaceLandmarks(useTinyModel)
-        .withFaceDescriptors();
-}
-
 async function detectSubjectsInImage(detections) {
     const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, constants.MAX_DESCRIPTOR_DISTANCE);
     return detections.map(detection =>
         faceMatcher.findBestMatch(detection.descriptor)
     );
-}
-
-function resizeMedia(media) {
-    const width = constants.CANVAS_DISPLAY_WIDTH;
-    const height = (media.height*constants.CANVAS_DISPLAY_WIDTH)/media.width
-    media.width = width;
-    media.height = height;
-    return media;
 }
 
 function drawDetectionsInCanvas(detections, canvas){

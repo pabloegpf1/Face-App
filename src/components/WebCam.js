@@ -35,14 +35,15 @@ class WebCam extends React.Component {
     }
 
     onPlay = async () => {
-        if (this.state.video.paused || this.state.video.ended)
+        if (this.state.video.paused || this.state.video.ended) {
             return setTimeout(() => this.onPlay())
-
-        const ts = Date.now();
-        if(await this.props.recognizeFaces({media: this.state.video, isImage: false})){
-            this.props.updateTimeStats(Date.now() - ts);
         }
-        
+        const canvas = document.createElement('canvas');
+        canvas.width = this.state.video.videoWidth;
+        canvas.height = this.state.video.videoHeight;
+        canvas.getContext('2d').drawImage(this.state.video, 0, 0);
+        const base64Image = canvas.toDataURL('image/png');
+        await this.props.recognizeFaces(base64Image);
         setTimeout(() => this.onPlay())
     }
 

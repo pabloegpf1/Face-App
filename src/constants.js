@@ -13,6 +13,7 @@ export const FACE_API_ERROR_TEXT = "Error loading TensorFlow";
 export const WASM_BACKEND = "wasm";
 export const CPU_BACKEND = "cpu";
 export const WEBGL_BACKEND = "webgl";
+export const SERVER_BACKEND = "server";
 export const MAX_DESCRIPTOR_DISTANCE = 0.6; 
 export const CANVAS_DISPLAY_WIDTH = 750;
 export const FACE_DETECTOR_INPUT_SIZE = 96;
@@ -21,6 +22,10 @@ export const WASM_PATH = './wasm/'
 export const BASE_URL = "/Face-App?backend=";
 export const FACEAPI_ERROR_TEXT = "Error loading Faceapi: ";
 export const FACE_DESCRIPTORS_KEY = "labeledFaceDescriptors"
+
+//Server
+export const SERVER_URL = "https://face-app-server.herokuapp.com/";
+export const SEND_DESCRIPTORS_PATH = "loadDescriptors";
 
 //HTML
 export const RESULT_CONTAINER_ID = "resultContainer";

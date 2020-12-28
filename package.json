@@ -12,7 +12,9 @@
     "react": "^16.13.1",
     "react-bootstrap": "^1.3.0",
     "react-dom": "^16.13.1",
-    "react-scripts": "^3.4.4"
+    "react-scripts": "^3.4.4",
+    "socket.io-client": "^3.0.4",
+    "socket.io-stream": "^0.9.1"
   },
   "scripts": {
     "prestart": "sudo cp ./node_modules/@tensorflow/tfjs-backend-wasm/dist/*.wasm ./public/wasm/",

@@ -32,6 +32,10 @@ function NavbarComponent(props) {
                         href={backendUrl(constants.WASM_BACKEND)} 
                         disabled={props.tfBackend===constants.WASM_BACKEND}
                     >wasm</Button>
+                    <Button 
+                        href={backendUrl(constants.SERVER_BACKEND)} 
+                        disabled={props.tfBackend===constants.SERVER_BACKEND}
+                    >server</Button>
                 </ButtonGroup>
             </Navbar.Collapse>
         </Navbar>)
