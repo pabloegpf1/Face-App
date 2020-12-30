@@ -18,7 +18,14 @@ class WebCam extends React.Component {
     }
 
     startWebcam = async () => {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: {"height":{"exact":300},"mediaSource":"camera","width":{"exact":300}} });
+        const constraints = { 
+            video: {
+                "height": { "exact":300 },
+                "width": { "exact":300 },
+                "mediaSource": "camera"
+            }
+        };
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
         const video = document.getElementById(constants.VIDEO_ID);
         if(!video) return;
         video.onloadeddata = this.onPlay;
@@ -44,7 +51,7 @@ class WebCam extends React.Component {
         canvas.getContext('2d').drawImage(this.state.video, 0, 0);
         const base64Image = canvas.toDataURL('image/png');
         await this.props.recognizeFaces(base64Image);
-        setTimeout(() => this.onPlay())
+        setTimeout(() => this.onPlay(), 100)
     }
 
     render = () => null; 

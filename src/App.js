@@ -55,9 +55,9 @@ class App extends React.Component {
         const ts = Date.now();
         let successfulDetection = false;
         if(BACKEND === constants.SERVER_BACKEND){
-            successfulDetection = await faceApiServer.sendImageToServer(base64image);
+            successfulDetection = await faceApiServer.recognize(base64image, this.updateTimeStats);
         } else {
-            successfulDetection = await faceApi.createCanvasFromHtmlMedia(base64image);
+            successfulDetection = await faceApi.recognize(base64image);
         }
         if(successfulDetection) {
             this.updateTimeStats(Date.now() - ts);

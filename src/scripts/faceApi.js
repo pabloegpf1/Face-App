@@ -25,13 +25,11 @@ export async function loadFaceApi(){
     .catch((error)=> console.error(constants.FACEAPI_ERROR_TEXT, error));
 }
 
-export async function createCanvasFromHtmlMedia(base64image){
-    const image = new Image();
-    image.src = base64image;
-    const media = await utils.resizeMedia(image);
-    const canvas = await faceapi.createCanvasFromMedia(media);
-    const dimensions = await faceapi.matchDimensions(canvas, media);
-    const detections = await getAllDetectionsForImage(media);
+export async function recognize(base64image){
+    const image = await utils.createImageFromBase64(base64image);
+    const canvas = await faceapi.createCanvasFromMedia(image);
+    const dimensions = await faceapi.matchDimensions(canvas, image);
+    const detections = await getAllDetectionsForImage(image);
     if(detections.length === 0) return false;
     const resizedDetections = await faceapi.resizeResults(detections, dimensions);
     if(labeledFaceDescriptors.length > 0) {
@@ -39,7 +37,7 @@ export async function createCanvasFromHtmlMedia(base64image){
     } else {
         await drawDetectionsInCanvas(resizedDetections, canvas);
     }
-    utils.showResultsInContainer({media, canvas});
+    utils.showResultsInContainer({canvas});
     return true;
 }
 

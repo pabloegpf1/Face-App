@@ -8,14 +8,18 @@ export async function saveLabeledDescriptorsInLocalStorage(labeledFaceDescriptor
     return localStorage.setItem(constants.FACE_DESCRIPTORS_KEY, JSON.stringify(labeledFaceDescriptors))
 }
 
-export const showResultsInContainer = ({media, canvas}) => {
+export const showResultsInContainer = async ({image, canvas}) => {
     const resultContainter = document.getElementById(constants.RESULT_CONTAINER_ID);
     const resultCanvas = document.getElementById(constants.CANVAS_ID);
-    const resultMedia = document.getElementById(constants.IMAGE_ID);
-    canvas.id = constants.CANVAS_ID;
-    media.id = resultMedia.id;
-    resultContainter.replaceChild(media, resultMedia);
-    resultContainter.replaceChild(canvas, resultCanvas);
+    const resultImage = document.getElementById(constants.IMAGE_ID);
+    if(canvas) {
+        canvas.id = constants.CANVAS_ID;
+        resultContainter.replaceChild(canvas, resultCanvas);
+    }
+    if(image) {
+        image.id = resultImage.id;
+        resultContainter.replaceChild(image, resultImage);
+    }
 }
 
 export const clearResultsContainer = () => {
@@ -24,21 +28,12 @@ export const clearResultsContainer = () => {
     clearCanvasContents();
 }
 
-export const sendDescriptorsToServer = (descriptors) => {
-    const formData = new FormData();
-    formData.append("descriptors", JSON.stringify(descriptors));
-
-    return fetch(constants.SERVER_URL + constants.SEND_DESCRIPTORS_PATH, {
-        method: "POST",
-        mode: 'no-cors',
-        body: formData
-    });
-}
-
-export const resizeMedia = (media) => {
-    media.width = media.width || 300;
-    media.height = media.height || 300;
-    return media;
+export const createImageFromBase64 = async (base64Image) => {
+    const image = new Image();
+    image.src = base64Image;
+    image.width = base64Image.width || 300;
+    image.height = base64Image.height || 300;
+    return image;
 }
 
 const clearImageContents = () => {

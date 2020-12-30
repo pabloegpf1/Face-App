@@ -25,6 +25,7 @@ export const FACE_DESCRIPTORS_KEY = "labeledFaceDescriptors"
 
 //Server
 export const SERVER_URL = "https://face-app-server.herokuapp.com/";
+export const SERVER_URL_DEV = "http://localhost:4000/";
 export const SEND_DESCRIPTORS_PATH = "loadDescriptors";
 
 //HTML

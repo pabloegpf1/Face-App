@@ -1,7 +1,11 @@
 let firstFrame, frameCount, totalTime = 0;
 
 export const getStatsFromTime = (newTime) => {
-    if(frameCount === 0) firstFrame = newTime;
+    if(frameCount === 0) {
+        firstFrame = newTime;
+        frameCount ++;
+        return;
+    } 
     updateTimeRecords(newTime);
     const averageTime = getAverageTime();
     const fps = getFpsFromAverageTime(averageTime);
