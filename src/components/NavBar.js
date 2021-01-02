@@ -11,10 +11,12 @@ function NavbarComponent(props) {
                 <Dropdown.Item onClick={() => props.changeCurrentTool(constants.WEBCAM_TOOL_KEY)}>
                     Webcam
                 </Dropdown.Item>
-                <Dropdown.Item onClick={() => props.changeCurrentTool(constants.REGISTER_FACE_TOOL_KEY)}>
+                <Dropdown.Item onClick={() => props.changeCurrentTool(constants.REGISTER_FACE_TOOL_KEY)}
+                    disabled = {props.tfBackend===constants.SERVER_BACKEND}
+                >
                     Register face
                 </Dropdown.Item>
-                <Dropdown.Item onClick={() => props.changeCurrentTool(constants.ANALYZE_IMAGE_TOOL_KEY)}>
+                <Dropdown.Item onClick={() => props.changeCurrentTool(constants.ANALYZE_IMAGE_TOOL_KEY)} disabled = "true">
                     Analyze image
                 </Dropdown.Item>
             </DropdownButton>

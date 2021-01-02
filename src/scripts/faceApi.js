@@ -27,6 +27,7 @@ export async function loadFaceApi(){
 
 export async function recognize(base64image){
     const image = await utils.createImageFromBase64(base64image);
+    await faceapi.awaitMediaLoaded(image);
     const canvas = await faceapi.createCanvasFromMedia(image);
     const dimensions = await faceapi.matchDimensions(canvas, image);
     const detections = await getAllDetectionsForImage(image);
