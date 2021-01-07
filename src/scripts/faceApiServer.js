@@ -15,8 +15,9 @@ socket.on('connect', function() {
 })
 
 export const recognize = (base64image, updateTimeStats) => {
-    const initialTime = Math.round(performance.now());
+    if(waitingForFrame) return;
     waitingForFrame = true;
+    const initialTime = Math.round(performance.now());
     socket.emit("recognize", {base64image, initialTime}, async (response) => {
         waitingForFrame = false;
         if(response.success) {
