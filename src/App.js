@@ -2,6 +2,7 @@ import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import RegisterFace from './components/RegisterFace';
 import AnalyzeImage from './components/AnalyzeImage';
+import AutoTest from './components/AutoTest';
 import WebCam from './components/WebCam';
 
 import Navbar from './components/NavBar';
@@ -13,6 +14,7 @@ import * as utils from './scripts/utils.js';
 import * as constants from './constants.js';
 
 const BACKEND = new URLSearchParams(window.location.search).get('backend') || 'webgl';
+
 let faceApiServer;
 
 class App extends React.Component {
@@ -26,8 +28,8 @@ class App extends React.Component {
         };
     }
 
-    componentDidMount(){
-        if(BACKEND === constants.SERVER_BACKEND){
+    componentDidMount() {
+        if (BACKEND === constants.SERVER_BACKEND) {
             faceApiServer = require('./scripts/faceApiServer.js');
         } else {
             this.loadFaceApi();
@@ -36,15 +38,15 @@ class App extends React.Component {
 
     loadFaceApi = () => {
         faceApi.loadTensorFlow(BACKEND)
-        .then((tf) => this.setState({tensorflowReady: true, tfBackend: tf.getBackend()}))
-        .then(() => faceApi.loadFaceApi())
-        .then(() => this.setState({faceApiReady: true}))
-        .catch((error) => console.error(constants.FACE_API_ERROR_TEXT, error));
+            .then((tf) => this.setState({ tensorflowReady: true, tfBackend: tf.getBackend() }))
+            .then(() => faceApi.loadFaceApi())
+            .then(() => this.setState({ faceApiReady: true }))
+            .catch((error) => console.error(constants.FACE_API_ERROR_TEXT, error));
     }
 
     updateTimeStats = (newTime) => {
         const stats = benchmark.getStatsFromTime(newTime);
-        this.setState({stats});
+        this.setState({ stats });
     }
 
     registerSubject = async (label, images) => {
@@ -54,79 +56,101 @@ class App extends React.Component {
     recognizeFaces = async (base64image) => {
         const ts = Date.now();
         let successfulDetection = false;
-        if(BACKEND === constants.SERVER_BACKEND){
+        if (BACKEND === constants.SERVER_BACKEND) {
             successfulDetection = await faceApiServer.recognize(base64image, this.updateTimeStats);
         } else {
             successfulDetection = await faceApi.recognize(base64image);
         }
-        if(successfulDetection) {
+        if (successfulDetection) {
             this.updateTimeStats(Date.now() - ts);
         }
     }
 
+    generateLandmarks = async (base64image) => {
+        const ts = Date.now();
+        const result = await faceApi.generateLandmarks(base64image);
+        this.storeAutoTestResult(result, Date.now() - ts);
+    }
+
     changeCurrentTool = (currentTool) => {
         utils.clearResultsContainer();
-        this.setState({currentTool, stats: null});
+        this.setState({ currentTool, stats: null });
     }
 
     getStatsText = () => {
-        if(!this.state.stats) return;
+        if (!this.state.stats) return;
         return `First Frame: ${this.state.stats.firstFrame} ms` +
-        ` | Average Time: ${this.state.stats.averageTime} ms` +
-        ` | New Time: ${this.state.stats.newTime} ms` +
-        ` | ${this.state.stats.fps} fps`
+            ` | Average Time: ${this.state.stats.averageTime} ms` +
+            ` | New Time: ${this.state.stats.newTime} ms` +
+            ` | ${this.state.stats.fps} fps`
+    }
+
+    storeAutoTestResult = (result, time) => {
+        let times = utils.getItemFromLocalStorage("times");
+
+        console.log(times)
+        if (!times) times = [];
+        times.push(time);
+        utils.setItemInLocalStorage("times", times);
     }
 
     getCurrentTool = () => {
         switch (this.state.currentTool) {
+            case constants.AUTOTEST_TOOL_KEY:
+                return (
+                    <AutoTest
+                        generateLandmarks={this.generateLandmarks}
+                        changeWebcamState={this.changeWebcamState}
+                    />
+                )
             case constants.WEBCAM_TOOL_KEY:
                 return (
-                    <WebCam 
+                    <WebCam
                         recognizeFaces={this.recognizeFaces}
                     />
                 )
             case constants.REGISTER_FACE_TOOL_KEY:
                 return (
-                    <RegisterFace 
+                    <RegisterFace
                         registerSubject={this.registerSubject}
                     />
                 )
             case constants.ANALYZE_IMAGE_TOOL_KEY:
                 return (
-                    <AnalyzeImage 
+                    <AnalyzeImage
                         recognizeFaces={this.recognizeFaces}
                         changeWebcamState={this.changeWebcamState}
                     />
-                )        
+                )
             default:
                 break;
         }
     }
 
     render() {
-        if(!this.state.tensorflowReady && BACKEND !== constants.SERVER_BACKEND){
+        if (!this.state.tensorflowReady && BACKEND !== constants.SERVER_BACKEND) {
             return (<p>Loading TensorFlow...</p>)
         }
-        if(!this.state.faceApiReady && BACKEND !== constants.SERVER_BACKEND){
+        if (!this.state.faceApiReady && BACKEND !== constants.SERVER_BACKEND) {
             return (<p>Loading FaceApi...</p>)
         }
-        else{
+        else {
             return (
                 <div className="App">
-                    <Navbar 
+                    <Navbar
                         changeCurrentTool={this.changeCurrentTool}
-                        tfBackend={this.state.tfBackend || BACKEND} 
+                        tfBackend={this.state.tfBackend || BACKEND}
                     />
                     <div className="center">
                         {this.getCurrentTool()}
                     </div>
-                    <Results/>
+                    <Results />
                     <p className="stats">
                         {this.getStatsText()}
                     </p>
                 </div>
             );
-        } 
+        }
     }
 }
 

@@ -1,50 +1,58 @@
-import {setWasmPaths} from '@tensorflow/tfjs-backend-wasm';
+import { setWasmPaths } from '@tensorflow/tfjs-backend-wasm';
 
 import * as faceapi from '@vladmandic/face-api/dist/face-api.esm.js';
 import * as utils from './utils';
 import * as constants from '../constants';
 
-const faceDetectorOptions = {inputSize: constants.FACE_DETECTOR_INPUT_SIZE};
+const faceDetectorOptions = { inputSize: constants.FACE_DETECTOR_INPUT_SIZE };
 const useTinyModel = true;
 let labeledFaceDescriptors = [];
 
-export async function loadTensorFlow(backend = constants.WEBGL_BACKEND){
+export async function loadTensorFlow(backend = constants.WEBGL_BACKEND) {
     await setWasmPaths(constants.WASM_PATH);
     await faceapi.tf.setBackend(backend);
     await faceapi.tf.ready();
     return faceapi.tf;
 }
 
-export async function loadFaceApi(){
+export async function loadFaceApi() {
     await loadLabeledDescriptorsFromLocalStorage();
     return Promise.all([
         faceapi.loadTinyFaceDetectorModel(constants.MODEL_PATH),
         faceapi.loadFaceLandmarkTinyModel(constants.MODEL_PATH),
         faceapi.loadFaceRecognitionModel(constants.MODEL_PATH),
     ])
-    .catch((error)=> console.error(constants.FACEAPI_ERROR_TEXT, error));
+        .catch((error) => console.error(constants.FACEAPI_ERROR_TEXT, error));
 }
 
-export async function recognize(base64image){
-    const image = await utils.createImageFromBase64(base64image);
+export async function recognize(image) {
+    image = await utils.createImageFromBase64(image);
     await faceapi.awaitMediaLoaded(image);
     const canvas = await faceapi.createCanvasFromMedia(image);
     const dimensions = await faceapi.matchDimensions(canvas, image);
     const detections = await getAllDetectionsForImage(image);
-    if(detections.length === 0) return false;
+    if (detections.length === 0) return false;
     const resizedDetections = await faceapi.resizeResults(detections, dimensions);
-    if(labeledFaceDescriptors.length > 0) {
+    if (labeledFaceDescriptors.length > 0) {
         await drawLabeledDetectionsInCanvas(resizedDetections, canvas);
     } else {
         await drawDetectionsInCanvas(resizedDetections, canvas);
     }
-    utils.showResultsInContainer({canvas});
+    utils.showResultsInContainer({ canvas });
+    return true;
+}
+
+export async function generateLandmarks(image) {
+    image = await utils.createImageFromBase64(image);
+    await faceapi.awaitMediaLoaded(image);
+    const detections = await getAllDetectionsForImage(image);
+    if (detections.length === 0) return false;
     return true;
 }
 
 export async function getLabeledDescriptors(label, images) {
     let descriptorsForSubject = [];
-    for(let i = 0; i<images.length; i++){
+    for (let i = 0; i < images.length; i++) {
         await faceapi.awaitMediaLoaded(images[i]);
         const detection = await getDetectionForImage(images[i]);
         descriptorsForSubject.push(detection.descriptor);
@@ -70,7 +78,7 @@ async function getDetectionForImage(image) {
 
 async function loadLabeledDescriptorsFromLocalStorage() {
     const loadedDescriptors = await utils.getItemFromLocalStorage(constants.FACE_DESCRIPTORS_KEY);
-    if(!loadedDescriptors) return;
+    if (!loadedDescriptors) return;
     loadedDescriptors.map(async (subject) => {
         const newSubject = new faceapi.LabeledFaceDescriptors(
             subject.label,
@@ -87,7 +95,7 @@ async function detectSubjectsInImage(detections) {
     );
 }
 
-function drawDetectionsInCanvas(detections, canvas){
+function drawDetectionsInCanvas(detections, canvas) {
     faceapi.draw.drawDetections(canvas, detections);
     faceapi.draw.drawFaceLandmarks(canvas, detections);
 }
