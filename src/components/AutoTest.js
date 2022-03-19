@@ -2,8 +2,9 @@ import React from 'react';
 import { ProgressBar, Button } from 'react-bootstrap';
 
 import * as constants from '../constants';
+import * as utils from '../scripts/utils';
 
-const IMAGE_SERVER_URL = constants.IMAGE_SERVER_URL;
+const IMAGE_PATH = constants.IMAGE_PATH;
 const IMAGE_SERVER_FORMAT = constants.IMAGE_SERVER_FORMAT;
 const DATASET_SIZE = constants.DATASET_SIZE;
 const BUTTON_DANGER_VARIANT = constants.BUTTON_DANGER_VARIANT;
@@ -16,7 +17,6 @@ class AnalyzeImage extends React.Component {
     constructor() {
         super();
         this.state = {
-            imageCount: 0,
             progress: 0,
             running: false,
             buttonVariant: BUTTON_SUCCESS_VARIANT,
@@ -25,13 +25,15 @@ class AnalyzeImage extends React.Component {
         this.startStopTest = this.startStopTest.bind(this);
     }
 
-    componentDidUpdate() {
-        //if (this.state.running) this.downloadNewImage();
+    componentDidMount() {
+        let timeCount = utils.getItemFromLocalStorage("timeCount");
+        if (!timeCount) timeCount = 0;
+        this.setState({ timeCount });
     }
 
     downloadNewImage = async () => {
         if (!this.state.running) return;
-        if (this.state.imageCount > 2) return;
+        if (this.state.imageCount >= DATASET_SIZE) return;
 
         const imageUrl = await this.getNextImageURL();
         const base64Image = await this.getBase64ImageFromUrl(imageUrl)
@@ -54,26 +56,37 @@ class AnalyzeImage extends React.Component {
     }
 
     startStopTest = async () => {
-        let buttonVariant = BUTTON_SUCCESS_VARIANT;
-        let buttonLabel = START_TEST;
+        let buttonVariant = BUTTON_DANGER_VARIANT;
+        let buttonLabel = STOP_TEST;
         let running = true;
         if (this.state.running) {
-            buttonVariant = BUTTON_DANGER_VARIANT;
-            buttonLabel = STOP_TEST;
+            buttonVariant = BUTTON_SUCCESS_VARIANT;
+            buttonLabel = START_TEST;
             running = false;
         }
         this.setState({ buttonLabel, buttonVariant, running },
             () => this.downloadNewImage())
     }
 
+    clearResults = async () => {
+        let timeCount = 0;
+        let times = [];
+        utils.setItemInLocalStorage("timeCount", timeCount);
+        utils.setItemInLocalStorage("timeArray", times);
+        this.setState({ timeCount, times });
+    }
+
     getNextImageURL = () => {
-        let currentImageCount = this.state.imageCount + 1;
-        let imageKey = currentImageCount.toString().padStart(4, '0');
+        console.log(this.state.timeCount)
+        let currentTimeCount = this.state.timeCount + 1;
         this.setState({
-            imageCount: currentImageCount,
-            progress: Math.round((currentImageCount / DATASET_SIZE) * 100)
+            timeCount: currentTimeCount,
+            progress: Math.round((currentTimeCount / DATASET_SIZE) * 100)
         });
-        let imageUrl = IMAGE_SERVER_URL + imageKey + IMAGE_SERVER_FORMAT;
+        let imageUrl = process.env.PUBLIC_URL +
+            IMAGE_PATH +
+            currentTimeCount +
+            IMAGE_SERVER_FORMAT;
         return imageUrl;
     }
 
@@ -86,7 +99,13 @@ class AnalyzeImage extends React.Component {
                 >
                     {this.state.buttonLabel}
                 </Button>{' '}
-                <p>Processing image {this.state.imageCount} out of {DATASET_SIZE}</p>
+                <Button
+                    variant="info"
+                    onClick={this.clearResults}
+                >
+                    CLEAR RESULTS
+                </Button>{' '}
+                <p>Processing image {this.state.timeCount} out of {DATASET_SIZE}</p>
                 <ProgressBar now={this.state.progress} label={`${this.state.progress}%`} />
             </div>
         )

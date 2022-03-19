@@ -86,12 +86,14 @@ class App extends React.Component {
     }
 
     storeAutoTestResult = (result, time) => {
-        let times = utils.getItemFromLocalStorage("times");
-
-        console.log(times)
-        if (!times) times = [];
-        times.push(time);
-        utils.setItemInLocalStorage("times", times);
+        let timeArray = utils.getItemFromLocalStorage("timeArray");
+        let timeCount = utils.getItemFromLocalStorage("timeCount");
+        if (!timeArray) timeArray = [];
+        if (!timeCount) timeCount = 1;
+        timeArray.push(time);
+        timeCount++;
+        utils.setItemInLocalStorage("timeArray", timeArray);
+        utils.setItemInLocalStorage("timeCount", timeCount);
     }
 
     getCurrentTool = () => {

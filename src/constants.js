@@ -38,8 +38,8 @@ export const BUTTON_SUCCESS_VARIANT = "success";
 export const BUTTON_DANGER_VARIANT = "danger";
 
 //AutoTest
-export const IMAGE_SERVER_URL = "https://www.ml2b.com/";
+export const IMAGE_PATH = "/data/";
 export const START_TEST = "START TEST";
 export const STOP_TEST = "STOP TEST";
 export const IMAGE_SERVER_FORMAT = ".jpg";
-export const DATASET_SIZE = 3;
+export const DATASET_SIZE = 13233;
