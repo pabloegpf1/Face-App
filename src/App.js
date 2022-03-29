@@ -9,11 +9,11 @@ import Navbar from './components/NavBar';
 import Results from './components/Results';
 
 import * as benchmark from './scripts/benchmark.js';
-import * as faceApi from './scripts/faceApi.js';
+import * as faceApi from './scripts/faceApiWrapper.js';
 import * as utils from './scripts/utils.js';
 import * as constants from './constants.js';
 
-const BACKEND = new URLSearchParams(window.location.search).get('backend') || 'webgl';
+const BACKEND = utils.getSelectedBackend();
 
 let faceApiServer;
 
@@ -67,9 +67,8 @@ class App extends React.Component {
     }
 
     generateLandmarks = async (base64image) => {
-        const ts = Date.now();
-        const result = await faceApi.generateLandmarks(base64image);
-        this.storeAutoTestResult(result, Date.now() - ts);
+        const { result, time } = await faceApi.generateLandmarks(base64image);
+        if (result) utils.storeAutoTestResult(time);
     }
 
     changeCurrentTool = (currentTool) => {
@@ -83,17 +82,6 @@ class App extends React.Component {
             ` | Average Time: ${this.state.stats.averageTime} ms` +
             ` | New Time: ${this.state.stats.newTime} ms` +
             ` | ${this.state.stats.fps} fps`
-    }
-
-    storeAutoTestResult = (result, time) => {
-        let timeArray = utils.getItemFromLocalStorage("timeArray");
-        let timeCount = utils.getItemFromLocalStorage("timeCount");
-        if (!timeArray) timeArray = [];
-        if (!timeCount) timeCount = 1;
-        timeArray.push(time);
-        timeCount++;
-        utils.setItemInLocalStorage("timeArray", timeArray);
-        utils.setItemInLocalStorage("timeCount", timeCount);
     }
 
     getCurrentTool = () => {

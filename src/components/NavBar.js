@@ -7,7 +7,7 @@ function NavbarComponent(props) {
     return (
         <Navbar bg="dark" variant="dark">
             <Navbar.Brand>Face App</Navbar.Brand>
-            <DropdownButton title="Tools">
+            <DropdownButton title="Tools" disabled>
                 <Dropdown.Item onClick={() => props.changeCurrentTool(constants.AUTOTEST_TOOL_KEY)}>
                     AutoTest
                 </Dropdown.Item>

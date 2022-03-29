@@ -26,9 +26,12 @@ class AnalyzeImage extends React.Component {
     }
 
     componentDidMount() {
-        let timeCount = utils.getItemFromLocalStorage("timeCount");
-        if (!timeCount) timeCount = 0;
-        this.setState({ timeCount });
+        this.updateImageCount();
+        utils.showAutoTestResults();
+    }
+
+    updateImageCount() {
+        this.setState({ timeCount: utils.getCurrentAutoResultsFromLocalStorage().length });
     }
 
     downloadNewImage = async () => {
@@ -36,26 +39,14 @@ class AnalyzeImage extends React.Component {
         if (this.state.imageCount >= DATASET_SIZE) return;
 
         const imageUrl = await this.getNextImageURL();
-        const base64Image = await this.getBase64ImageFromUrl(imageUrl)
+        const base64Image = await utils.getBase64ImageFromUrl(imageUrl)
 
         await this.props.generateLandmarks(base64Image);
         await this.downloadNewImage();
-        return;
-    }
-
-    getBase64ImageFromUrl = async (imageUrl) => {
-        const image = document.createElement("img");
-        image.src = imageUrl;
-        image.crossOrigin = "anonymous"
-        await image.decode();
-        const canvas = document.createElement('canvas');
-        canvas.width = image.width;
-        canvas.height = image.height;
-        canvas.getContext('2d').drawImage(image, 0, 0);
-        return canvas.toDataURL('image/png');
     }
 
     startStopTest = async () => {
+        this.updateImageCount();
         let buttonVariant = BUTTON_DANGER_VARIANT;
         let buttonLabel = STOP_TEST;
         let running = true;
@@ -68,16 +59,8 @@ class AnalyzeImage extends React.Component {
             () => this.downloadNewImage())
     }
 
-    clearResults = async () => {
-        let timeCount = 0;
-        let times = [];
-        utils.setItemInLocalStorage("timeCount", timeCount);
-        utils.setItemInLocalStorage("timeArray", times);
-        this.setState({ timeCount, times });
-    }
-
     getNextImageURL = () => {
-        console.log(this.state.timeCount)
+        utils.showAutoTestResults();
         let currentTimeCount = this.state.timeCount + 1;
         this.setState({
             timeCount: currentTimeCount,
@@ -93,20 +76,25 @@ class AnalyzeImage extends React.Component {
     render() {
         return (
             <div className="center">
-                <Button
-                    variant={this.state.buttonVariant}
-                    onClick={this.startStopTest}
-                >
-                    {this.state.buttonLabel}
-                </Button>{' '}
-                <Button
-                    variant="info"
-                    onClick={this.clearResults}
-                >
-                    CLEAR RESULTS
-                </Button>{' '}
-                <p>Processing image {this.state.timeCount} out of {DATASET_SIZE}</p>
-                <ProgressBar now={this.state.progress} label={`${this.state.progress}%`} />
+                <div className="autotest-buttons">
+                    <Button
+                        variant={this.state.buttonVariant}
+                        onClick={this.startStopTest}
+                    >
+                        {this.state.buttonLabel}
+                    </Button>{' '}
+                    <Button
+                        variant="info"
+                        onClick={utils.clearAutoTestResults}
+                        disabled={this.state.running}
+                    >
+                        CLEAR RESULTS
+                    </Button>{' '}
+                </div>
+                <ProgressBar className="progressBar"
+                    now={this.state.progress}
+                    label={`${this.state.progress}%`}
+                />
             </div>
         )
     }

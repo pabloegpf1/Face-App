@@ -45,9 +45,10 @@ export async function recognize(image) {
 export async function generateLandmarks(image) {
     image = await utils.createImageFromBase64(image);
     await faceapi.awaitMediaLoaded(image);
+    const ts = Date.now();
     const detections = await getAllDetectionsForImage(image);
-    if (detections.length === 0) return false;
-    return true;
+    if (detections.length === 0) return { result: false, time: Date.now() - ts };
+    return { result: true, time: Date.now() - ts };
 }
 
 export async function getLabeledDescriptors(label, images) {
