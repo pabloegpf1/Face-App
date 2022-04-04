@@ -42,7 +42,12 @@ export const getBase64ImageFromUrl = async (imageUrl) => {
     const image = document.createElement("img");
     image.src = imageUrl;
     image.crossOrigin = "anonymous"
-    await image.decode();
+    try {
+        await image.decode();
+    } catch (error) {
+        console.error(error);
+        return;
+    }
     const canvas = document.createElement('canvas');
     canvas.width = image.width;
     canvas.height = image.height;
@@ -57,11 +62,15 @@ export const clearResultsContainer = () => {
 }
 
 export const createImageFromBase64 = async (base64Image) => {
-    const image = new Image();
-    image.src = base64Image;
-    image.width = base64Image.width || 300;
-    image.height = base64Image.height || 300;
-    return image;
+    try {
+        const image = new Image();
+        image.src = base64Image;
+        image.width = base64Image.width || 300;
+        image.height = base64Image.height || 300;
+        return image;
+    } catch (error) {
+        return;
+    }
 }
 
 export const getCurrentAutoResultsFromLocalStorage = () => {
