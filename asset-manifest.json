@@ -1,0 +1,25 @@
+{
+  "files": {
+    "main.css": "https://www.pabloescriva.com/Face-App/static/css/main.48b6bca3.chunk.css",
+    "main.js": "https://www.pabloescriva.com/Face-App/static/js/main.487d6ff9.chunk.js",
+    "main.js.map": "https://www.pabloescriva.com/Face-App/static/js/main.487d6ff9.chunk.js.map",
+    "runtime-main.js": "https://www.pabloescriva.com/Face-App/static/js/runtime-main.f73dee77.js",
+    "runtime-main.js.map": "https://www.pabloescriva.com/Face-App/static/js/runtime-main.f73dee77.js.map",
+    "static/css/2.d9ad5f5c.chunk.css": "https://www.pabloescriva.com/Face-App/static/css/2.d9ad5f5c.chunk.css",
+    "static/js/2.2a3efebc.chunk.js": "https://www.pabloescriva.com/Face-App/static/js/2.2a3efebc.chunk.js",
+    "static/js/2.2a3efebc.chunk.js.map": "https://www.pabloescriva.com/Face-App/static/js/2.2a3efebc.chunk.js.map",
+    "index.html": "https://www.pabloescriva.com/Face-App/index.html",
+    "precache-manifest.173cda07a3562315ebe7b1e76e89705c.js": "https://www.pabloescriva.com/Face-App/precache-manifest.173cda07a3562315ebe7b1e76e89705c.js",
+    "service-worker.js": "https://www.pabloescriva.com/Face-App/service-worker.js",
+    "static/css/2.d9ad5f5c.chunk.css.map": "https://www.pabloescriva.com/Face-App/static/css/2.d9ad5f5c.chunk.css.map",
+    "static/css/main.48b6bca3.chunk.css.map": "https://www.pabloescriva.com/Face-App/static/css/main.48b6bca3.chunk.css.map",
+    "static/js/2.2a3efebc.chunk.js.LICENSE.txt": "https://www.pabloescriva.com/Face-App/static/js/2.2a3efebc.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.f73dee77.js",
+    "static/css/2.d9ad5f5c.chunk.css",
+    "static/js/2.2a3efebc.chunk.js",
+    "static/css/main.48b6bca3.chunk.css",
+    "static/js/main.487d6ff9.chunk.js"
+  ]
+}
